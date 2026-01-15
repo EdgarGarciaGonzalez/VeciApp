@@ -1,98 +1,188 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React from "react";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const TAB_BAR_HEIGHT = 72;
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const actas = [
+    "Acta Junta Ordinaria 15/03/2024",
+    "Acta Junta Ordinaria 20/03/2023",
+    "Acta Junta Ordinaria aprobación de cuentas 2022",
+  ];
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  return (
+    <SafeAreaView style={styles.safe} edges={["top"]}>
+      {/* HEADER */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>VeciApp</Text>
+      </View>
+
+      {/* CONTENIDO */}
+      <View style={{ flex: 1 }}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.content,
+            { paddingBottom: TAB_BAR_HEIGHT + 18 },
+          ]}
+        >
+          {/* ALERTAS (más destacado) */}
+          <Text style={styles.alertTitle}>Alertas importantes</Text>
+
+          <View style={styles.alertBox}>
+            <Pressable style={styles.alertRow} onPress={() => {}}>
+              <Ionicons name="alert-circle-outline" size={20} color="#1E3A8A" />
+              <Text style={styles.alertText}>Fuga de agua en el bloque B</Text>
+            </Pressable>
+
+            <Pressable style={styles.alertRow} onPress={() => {}}>
+              <Ionicons name="cash-outline" size={20} color="#1E3A8A" />
+              <Text style={styles.alertText}>Mensualidad pendiente</Text>
+            </Pressable>
+          </View>
+
+          {/* ACTAS DIGITALES */}
+          <Text style={[styles.sectionTitle, { marginTop: 8 }]}>
+            Actas digitales
+          </Text>
+
+          <View style={styles.chipsWrap}>
+            {actas.map((t) => (
+              <Pressable key={t} style={styles.chip} onPress={() => {}}>
+                <Text style={styles.chipText}>{t}</Text>
+              </Pressable>
+            ))}
+          </View>
+
+          {/* ACCESOS RÁPIDOS */}
+          <Text style={[styles.sectionTitle, { marginTop: 18 }]}>
+            Accesos rápidos
+          </Text>
+
+          <Pressable style={[styles.quickCard, styles.quickPrimary]} onPress={() => {}}>
+            <Ionicons name="build-outline" size={20} color="#1E3A8A" />
+            <Text style={styles.quickText}>Crear incidencia</Text>
+          </Pressable>
+
+          <Pressable style={[styles.quickCard, styles.quickSecondary]} onPress={() => {}}>
+            <Ionicons name="card-outline" size={20} color="#1E40AF" />
+            <Text style={styles.quickText}>Pagos mensuales</Text>
+          </Pressable>
+
+          <Pressable style={[styles.quickCard, styles.quickLight]} onPress={() => {}}>
+            <Ionicons name="checkmark-done-outline" size={20} color="#1E40AF" />
+            <Text style={styles.quickText}>Votaciones</Text>
+          </Pressable>
+
+          <Pressable style={[styles.quickCard, styles.quickNeutral]} onPress={() => {}}>
+            <Ionicons name="document-text-outline" size={20} color="#1E40AF" />
+            <Text style={styles.quickText}>Documentos</Text>
+          </Pressable>
+        </ScrollView>
+      </View>
+
+      {/* TAB BAR */}
+      <View style={[styles.tabBar, { height: TAB_BAR_HEIGHT }]}>
+        <Tab icon="home-outline" label="Inicio" />
+        <Tab icon="chatbubble-ellipses-outline" label="Chats" />
+        <Tab icon="bar-chart-outline" label="Economía" />
+        <Tab icon="people-outline" label="Contactos" />
+      </View>
+    </SafeAreaView>
+  );
+}
+
+function Tab({ icon, label }) {
+  return (
+    <Pressable style={styles.tabItem} onPress={() => {}}>
+      <Ionicons name={icon} size={22} />
+      <Text style={styles.tabLabel}>{label}</Text>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  safe: { flex: 1, backgroundColor: "white" },
+
+  header: {
+    height: 64,
+    backgroundColor: "#0B3CCF",
+    justifyContent: "center",
+    paddingHorizontal: 18,
   },
-  stepContainer: {
-    gap: 8,
+  headerTitle: { color: "white", fontSize: 20, fontWeight: "700" },
+
+  content: { padding: 18 },
+
+  sectionTitle: { fontSize: 16, fontWeight: "700", marginBottom: 10 },
+
+  // ALERTAS DESTACADAS
+  alertTitle: {
+    fontSize: 18,
+    fontWeight: "800",
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  alertBox: {
+    backgroundColor: "#EEF2FF",
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: "#1E40AF",
   },
+  alertRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 8,
+  },
+  alertText: {
+    fontSize: 15,
+    fontWeight: "500",
+  },
+
+  // ACTAS
+  chipsWrap: { gap: 10 },
+  chip: {
+    alignSelf: "flex-start",
+    borderWidth: 1,
+    borderColor: "#CBD5E1",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+  },
+  chipText: { fontSize: 13 },
+
+  // ACCESOS RÁPIDOS
+  quickCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    padding: 16,
+    borderRadius: 14,
+    marginBottom: 12,
+  },
+  quickText: { fontSize: 15, fontWeight: "500" },
+
+  quickPrimary: { backgroundColor: "#E0E7FF" },
+  quickSecondary: { backgroundColor: "#DBEAFE" },
+  quickLight: { backgroundColor: "#EFF6FF" },
+  quickNeutral: { backgroundColor: "#F1F5F9" },
+
+  // TAB BAR
+  tabBar: {
+    borderTopWidth: 1,
+    borderTopColor: "#E5E7EB",
+    flexDirection: "row",
+    backgroundColor: "white",
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+  },
+  tabLabel: { fontSize: 11 },
 });
