@@ -2,6 +2,8 @@ import React from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect } from "react";
+import { supabase } from "../../src/lib/supabase";
 
 const TAB_BAR_HEIGHT = 72;
 
@@ -28,7 +30,7 @@ export default function HomeScreen() {
             { paddingBottom: TAB_BAR_HEIGHT + 18 },
           ]}
         >
-          {/* ALERTAS (más destacado) */}
+          {/* ALERTAS */}
           <Text style={styles.alertTitle}>Alertas importantes</Text>
 
           <View style={styles.alertBox}>
@@ -118,7 +120,7 @@ const styles = StyleSheet.create({
 
   sectionTitle: { fontSize: 16, fontWeight: "700", marginBottom: 10 },
 
-  // ALERTAS DESTACADAS
+  // ALERTAS
   alertTitle: {
     fontSize: 18,
     fontWeight: "800",
@@ -186,3 +188,15 @@ const styles = StyleSheet.create({
   },
   tabLabel: { fontSize: 11 },
 });
+useEffect(() => {
+  const testConnection = async () => {
+    const { data, error } = await supabase
+      .from("test")
+      .select("*");
+
+    console.log("DATA:", data);
+    console.log("ERROR:", error);
+  };
+
+  testConnection();
+}, []);
