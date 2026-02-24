@@ -1,18 +1,57 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect } from "react";
+import { useRouter } from "expo-router";
 import { supabase } from "../../src/lib/supabase";
 
 const TAB_BAR_HEIGHT = 72;
 
+type Incidencia = {
+  id: string;
+  titulo: string;
+  estado: string;
+  prioridad: number;
+  created_at: string;
+};
+
 export default function HomeScreen() {
+  const router = useRouter();
+
   const actas = [
     "Acta Junta Ordinaria 15/03/2024",
     "Acta Junta Ordinaria 20/03/2023",
     "Acta Junta Ordinaria aprobación de cuentas 2022",
   ];
+
+  const [ultimasIncidencias, setUltimasIncidencias] = useState<Incidencia[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const cargarUltimasIncidencias = async () => {
+      setErrorMsg(null);
+
+      const { data, error } = await supabase
+        .from("incidencia")
+        .select("id,titulo,estado,prioridad,created_at")
+        .order("created_at", { ascending: false })
+        .limit(2);
+
+      if (error) {
+        setErrorMsg(error.message);
+        setUltimasIncidencias([]);
+        return;
+      }
+
+      setUltimasIncidencias(data ?? []);
+    };
+
+    cargarUltimasIncidencias();
+  }, []);
+
+  const irAIncidencias = () => {
+    router.push("/(tabs)/incidencias");
+  };
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -31,14 +70,30 @@ export default function HomeScreen() {
           ]}
         >
           {/* ALERTAS */}
-          <Text style={styles.alertTitle}>Alertas importantes</Text>
+          <View style={styles.alertHeaderRow}>
+            <Text style={styles.alertTitle}>Alertas importantes</Text>
+
+            <Pressable onPress={irAIncidencias} style={styles.alertSeeAll}>
+              <Text style={styles.alertSeeAllText}>Ver incidencias</Text>
+              <Ionicons name="chevron-forward" size={16} color="#1E40AF" />
+            </Pressable>
+          </View>
 
           <View style={styles.alertBox}>
-            <Pressable style={styles.alertRow} onPress={() => {}}>
-              <Ionicons name="alert-circle-outline" size={20} color="#1E3A8A" />
-              <Text style={styles.alertText}>Fuga de agua en el bloque B</Text>
-            </Pressable>
+            {errorMsg ? (
+              <Text style={{ color: "#991B1B" }}>Error: {errorMsg}</Text>
+            ) : ultimasIncidencias.length === 0 ? (
+              <Text style={styles.alertText}>No hay incidencias recientes.</Text>
+            ) : (
+              ultimasIncidencias.map((inc) => (
+                <Pressable key={inc.id} style={styles.alertRow} onPress={irAIncidencias}>
+                  <Ionicons name="alert-circle-outline" size={20} color="#1E3A8A" />
+                  <Text style={styles.alertText}>{inc.titulo}</Text>
+                </Pressable>
+              ))
+            )}
 
+            {/* Ejemplo de alerta fija (si quieres mantenerla) */}
             <Pressable style={styles.alertRow} onPress={() => {}}>
               <Ionicons name="cash-outline" size={20} color="#1E3A8A" />
               <Text style={styles.alertText}>Mensualidad pendiente</Text>
@@ -63,7 +118,11 @@ export default function HomeScreen() {
             Accesos rápidos
           </Text>
 
-          <Pressable style={[styles.quickCard, styles.quickPrimary]} onPress={() => {}}>
+          {/* ✅ Este botón te lleva a Incidencias */}
+          <Pressable
+            style={[styles.quickCard, styles.quickPrimary]}
+            onPress={irAIncidencias}
+          >
             <Ionicons name="build-outline" size={20} color="#1E3A8A" />
             <Text style={styles.quickText}>Crear incidencia</Text>
           </Pressable>
@@ -85,7 +144,7 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
 
-      {/* TAB BAR */}
+      {/* TAB BAR (visual) */}
       <View style={[styles.tabBar, { height: TAB_BAR_HEIGHT }]}>
         <Tab icon="home-outline" label="Inicio" />
         <Tab icon="chatbubble-ellipses-outline" label="Chats" />
@@ -96,7 +155,7 @@ export default function HomeScreen() {
   );
 }
 
-function Tab({ icon, label }) {
+function Tab({ icon, label }: { icon: any; label: string }) {
   return (
     <Pressable style={styles.tabItem} onPress={() => {}}>
       <Ionicons name={icon} size={22} />
@@ -121,10 +180,18 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 16, fontWeight: "700", marginBottom: 10 },
 
   // ALERTAS
+  alertHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  alertSeeAll: { flexDirection: "row", alignItems: "center", gap: 4 },
+  alertSeeAllText: { color: "#1E40AF", fontWeight: "700" },
+
   alertTitle: {
     fontSize: 18,
     fontWeight: "800",
-    marginBottom: 8,
   },
   alertBox: {
     backgroundColor: "#EEF2FF",
@@ -173,7 +240,7 @@ const styles = StyleSheet.create({
   quickLight: { backgroundColor: "#EFF6FF" },
   quickNeutral: { backgroundColor: "#F1F5F9" },
 
-  // TAB BAR
+  // TAB BAR (visual)
   tabBar: {
     borderTopWidth: 1,
     borderTopColor: "#E5E7EB",
@@ -188,15 +255,3 @@ const styles = StyleSheet.create({
   },
   tabLabel: { fontSize: 11 },
 });
-useEffect(() => {
-  const testConnection = async () => {
-    const { data, error } = await supabase
-      .from("test")
-      .select("*");
-
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
-  };
-
-  testConnection();
-}, []);
