@@ -128,10 +128,6 @@ export default function NuevaIncidenciaScreen() {
           {guardando ? "Guardando..." : "Crear incidencia"}
         </Text>
       </Pressable>
-
-      <Text style={{ marginTop: 14, color: "#777" }}>
-        Nota: de momento usamos un usuario demo (laura@veciapp.com). Más adelante lo conectamos con login real.
-      </Text>
     </ScrollView>
   );
 }

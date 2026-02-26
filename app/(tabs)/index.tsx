@@ -49,9 +49,8 @@ export default function HomeScreen() {
     cargarUltimasIncidencias();
   }, []);
 
-  const irAIncidencias = () => {
-    router.push("/(tabs)/incidencias");
-  };
+  const irAIncidencias = () => router.push("/(tabs)/incidencias");
+  const irAInicio = () => router.push("/(tabs)");
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -86,14 +85,22 @@ export default function HomeScreen() {
               <Text style={styles.alertText}>No hay incidencias recientes.</Text>
             ) : (
               ultimasIncidencias.map((inc) => (
-                <Pressable key={inc.id} style={styles.alertRow} onPress={irAIncidencias}>
-                  <Ionicons name="alert-circle-outline" size={20} color="#1E3A8A" />
+                <Pressable
+                  key={inc.id}
+                  style={styles.alertRow}
+                  onPress={irAIncidencias}
+                >
+                  <Ionicons
+                    name="alert-circle-outline"
+                    size={20}
+                    color="#1E3A8A"
+                  />
                   <Text style={styles.alertText}>{inc.titulo}</Text>
                 </Pressable>
               ))
             )}
 
-            {/* Ejemplo de alerta fija (si quieres mantenerla) */}
+            {/* Alerta fija (opcional) */}
             <Pressable style={styles.alertRow} onPress={() => {}}>
               <Ionicons name="cash-outline" size={20} color="#1E3A8A" />
               <Text style={styles.alertText}>Mensualidad pendiente</Text>
@@ -118,7 +125,6 @@ export default function HomeScreen() {
             Accesos rápidos
           </Text>
 
-          {/* ✅ Este botón te lleva a Incidencias */}
           <Pressable
             style={[styles.quickCard, styles.quickPrimary]}
             onPress={irAIncidencias}
@@ -127,18 +133,35 @@ export default function HomeScreen() {
             <Text style={styles.quickText}>Crear incidencia</Text>
           </Pressable>
 
-          <Pressable style={[styles.quickCard, styles.quickSecondary]} onPress={() => {}}>
+          <Pressable
+            style={[styles.quickCard, styles.quickSecondary]}
+            onPress={() => {}}
+          >
             <Ionicons name="card-outline" size={20} color="#1E40AF" />
             <Text style={styles.quickText}>Pagos mensuales</Text>
           </Pressable>
 
-          <Pressable style={[styles.quickCard, styles.quickLight]} onPress={() => {}}>
-            <Ionicons name="checkmark-done-outline" size={20} color="#1E40AF" />
+          <Pressable
+            style={[styles.quickCard, styles.quickLight]}
+            onPress={() => {}}
+          >
+            <Ionicons
+              name="checkmark-done-outline"
+              size={20}
+              color="#1E40AF"
+            />
             <Text style={styles.quickText}>Votaciones</Text>
           </Pressable>
 
-          <Pressable style={[styles.quickCard, styles.quickNeutral]} onPress={() => {}}>
-            <Ionicons name="document-text-outline" size={20} color="#1E40AF" />
+          <Pressable
+            style={[styles.quickCard, styles.quickNeutral]}
+            onPress={() => {}}
+          >
+            <Ionicons
+              name="document-text-outline"
+              size={20}
+              color="#1E40AF"
+            />
             <Text style={styles.quickText}>Documentos</Text>
           </Pressable>
         </ScrollView>
@@ -146,18 +169,26 @@ export default function HomeScreen() {
 
       {/* TAB BAR (visual) */}
       <View style={[styles.tabBar, { height: TAB_BAR_HEIGHT }]}>
-        <Tab icon="home-outline" label="Inicio" />
-        <Tab icon="chatbubble-ellipses-outline" label="Chats" />
-        <Tab icon="bar-chart-outline" label="Economía" />
-        <Tab icon="people-outline" label="Contactos" />
+        <Tab icon="home-outline" label="Inicio" onPress={irAInicio} />
+        <Tab icon="chatbubble-ellipses-outline" label="Chats" onPress={() => {}} />
+        <Tab icon="bar-chart-outline" label="Economía" onPress={() => {}} />
+        <Tab icon="people-outline" label="Contactos" onPress={() => {}} />
       </View>
     </SafeAreaView>
   );
 }
 
-function Tab({ icon, label }: { icon: any; label: string }) {
+function Tab({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: any;
+  label: string;
+  onPress: () => void;
+}) {
   return (
-    <Pressable style={styles.tabItem} onPress={() => {}}>
+    <Pressable style={styles.tabItem} onPress={onPress}>
       <Ionicons name={icon} size={22} />
       <Text style={styles.tabLabel}>{label}</Text>
     </Pressable>
@@ -189,10 +220,7 @@ const styles = StyleSheet.create({
   alertSeeAll: { flexDirection: "row", alignItems: "center", gap: 4 },
   alertSeeAllText: { color: "#1E40AF", fontWeight: "700" },
 
-  alertTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-  },
+  alertTitle: { fontSize: 18, fontWeight: "800" },
   alertBox: {
     backgroundColor: "#EEF2FF",
     borderRadius: 14,
@@ -207,10 +235,7 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 8,
   },
-  alertText: {
-    fontSize: 15,
-    fontWeight: "500",
-  },
+  alertText: { fontSize: 15, fontWeight: "500" },
 
   // ACTAS
   chipsWrap: { gap: 10 },
@@ -240,7 +265,7 @@ const styles = StyleSheet.create({
   quickLight: { backgroundColor: "#EFF6FF" },
   quickNeutral: { backgroundColor: "#F1F5F9" },
 
-  // TAB BAR (visual)
+  // TAB BAR
   tabBar: {
     borderTopWidth: 1,
     borderTopColor: "#E5E7EB",
