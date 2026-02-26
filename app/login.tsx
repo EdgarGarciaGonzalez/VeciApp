@@ -32,7 +32,6 @@ export default function LoginScreen() {
     }
 
     if (data.session) {
-      // ✅ Login OK -> te mando al inicio
       router.replace("/(tabs)");
     } else {
       Alert.alert("Error", "No se pudo iniciar sesión.");
@@ -47,9 +46,7 @@ export default function LoginScreen() {
 
       <View style={styles.container}>
         <Text style={styles.title}>Iniciar sesión</Text>
-        <Text style={styles.subtitle}>
-          Accede a tu comunidad con tu cuenta
-        </Text>
+        <Text style={styles.subtitle}>Accede a tu comunidad</Text>
 
         <Text style={styles.label}>Email</Text>
         <TextInput
@@ -109,7 +106,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 26, fontWeight: "800", marginBottom: 6 },
   subtitle: { color: "#666", marginBottom: 22 },
 
-  label: { fontSize: 14, fontWeight: "700", marginBottom: 6 },
+  label: { fontSize: 14, fontWeight: "800", marginBottom: 6 },
 
   input: {
     borderWidth: 1,

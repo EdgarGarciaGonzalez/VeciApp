@@ -8,34 +8,23 @@ export default function Index() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const checkSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
+    const check = async () => {
+      const { data } = await supabase.auth.getSession();
 
-      if (error) {
-        router.replace("/login");
-        setChecking(false);
-        return;
-      }
-
-      if (data.session) {
-        router.replace("/(tabs)");
-      } else {
-        router.replace("/login");
-      }
+      if (data.session) router.replace("/(tabs)");
+      else router.replace("/login");
 
       setChecking(false);
     };
 
-    checkSession();
+    check();
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) router.replace("/(tabs)");
       else router.replace("/login");
     });
 
-    return () => {
-      sub.subscription.unsubscribe();
-    };
+    return () => sub.subscription.unsubscribe();
   }, [router]);
 
   if (checking) {
