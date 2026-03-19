@@ -153,17 +153,17 @@ export default function HomeScreen() {
             <Text style={styles.quickText}>Votaciones</Text>
           </Pressable>
 
-          <Pressable
-            style={[styles.quickCard, styles.quickNeutral]}
-            onPress={() => {}}
-          >
-            <Ionicons
-              name="document-text-outline"
-              size={20}
-              color="#1E40AF"
-            />
-            <Text style={styles.quickText}>Documentos</Text>
-          </Pressable>
+         <Pressable
+           style={[styles.quickCard, styles.quickNeutral]}
+           onPress={() => router.push("/(tabs)/documentos")}
+         >
+           <Ionicons
+             name="document-text-outline"
+             size={20}
+             color="#1E40AF"
+           />
+           <Text style={styles.quickText}>Documentos</Text>
+         </Pressable>
         </ScrollView>
       </View>
 
