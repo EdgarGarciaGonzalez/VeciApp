@@ -4,6 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { supabase } from "../../src/lib/supabase";
+import TabButton from "../../src/components/TabButton";
+
 
 const TAB_BAR_HEIGHT = 72;
 
@@ -133,13 +135,13 @@ export default function HomeScreen() {
             <Text style={styles.quickText}>Crear incidencia</Text>
           </Pressable>
 
-          <Pressable
-            style={[styles.quickCard, styles.quickSecondary]}
-            onPress={() => {}}
-          >
-            <Ionicons name="card-outline" size={20} color="#1E40AF" />
-            <Text style={styles.quickText}>Pagos mensuales</Text>
-          </Pressable>
+         <Pressable
+           style={[styles.quickCard, styles.quickSecondary]}
+           onPress={() => router.push("/(tabs)/economia")}
+         >
+           <Ionicons name="card-outline" size={20} color="#1E40AF" />
+           <Text style={styles.quickText}>Pagos mensuales</Text>
+         </Pressable>
 
           <Pressable
             style={[styles.quickCard, styles.quickLight]}
@@ -169,10 +171,27 @@ export default function HomeScreen() {
 
       {/* TAB BAR (visual) */}
       <View style={[styles.tabBar, { height: TAB_BAR_HEIGHT }]}>
-        <Tab icon="home-outline" label="Inicio" onPress={irAInicio} />
-        <Tab icon="chatbubble-ellipses-outline" label="Chats" onPress={() => {}} />
-        <Tab icon="bar-chart-outline" label="Economía" onPress={() => {}} />
-        <Tab icon="people-outline" label="Contactos" onPress={() => {}} />
+        <TabButton
+          icon="home-outline"
+          label="Inicio"
+          onPress={() => router.push("/(tabs)")}
+        />
+        <TabButton
+          icon="chatbubble-ellipses-outline"
+          label="Chats"
+          onPress={() => {}}
+        />
+        <TabButton
+          icon="bar-chart-outline"
+          label="Economía"
+          onPress={() => router.push("/(tabs)/economia")}
+          active
+        />
+        <TabButton
+          icon="call-outline"
+          label="Contactos"
+          onPress={() => {}}
+        />
       </View>
     </SafeAreaView>
   );
