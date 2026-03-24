@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { supabase } from "../../src/lib/supabase";
 import * as DocumentPicker from "expo-document-picker";
+import { File } from "expo-file-system";
 
 const TAB_BAR_HEIGHT = 72;
 
@@ -45,6 +46,7 @@ export default function DocumentosScreen() {
     const { data, error } = await supabase
       .from("documento")
       .select("id,titulo,tipo,categoria,fecha,archivo_path")
+      .eq("comunidad_id", COMUNIDAD_ID)
       .order("fecha", { ascending: false });
 
     if (error) {
@@ -61,9 +63,7 @@ export default function DocumentosScreen() {
   }, []);
 
   const abrirDocumento = async (archivoPath: string) => {
-    const { data } = supabase.storage
-      .from("documentos")
-      .getPublicUrl(archivoPath);
+    const { data } = supabase.storage.from("documentos").getPublicUrl(archivoPath);
 
     const url = data.publicUrl;
 
@@ -102,25 +102,24 @@ export default function DocumentosScreen() {
         return;
       }
 
-      const file = result.assets[0];
+      const asset = result.assets[0];
 
-      if (!file.uri) {
+      if (!asset?.uri) {
         setSubiendo(false);
         Alert.alert("Error", "No se pudo leer el archivo.");
         return;
       }
 
-      // Descargar el archivo local y convertirlo a blob
-      const response = await fetch(file.uri);
-      const blob = await response.blob();
+      const pickedFile = new File(asset.uri);
+      const arrayBuffer = await pickedFile.arrayBuffer();
 
-      const nombreArchivo = `${Date.now()}-${file.name}`;
+      const nombreSeguro = (asset.name || "documento.pdf").replace(/\s+/g, "-");
+      const nombreArchivo = `${COMUNIDAD_ID}/${Date.now()}-${nombreSeguro}`;
 
-      // Subir a Storage
       const { error: uploadError } = await supabase.storage
         .from("documentos")
-        .upload(nombreArchivo, blob, {
-          contentType: "application/pdf",
+        .upload(nombreArchivo, arrayBuffer, {
+          contentType: asset.mimeType || "application/pdf",
           upsert: false,
         });
 
@@ -130,7 +129,6 @@ export default function DocumentosScreen() {
         return;
       }
 
-      // Guardar en tabla documento
       const { error: insertError } = await supabase.from("documento").insert([
         {
           comunidad_id: COMUNIDAD_ID,
@@ -142,21 +140,26 @@ export default function DocumentosScreen() {
         },
       ]);
 
-      setSubiendo(false);
-
       if (insertError) {
+        await supabase.storage.from("documentos").remove([nombreArchivo]);
+        setSubiendo(false);
         Alert.alert("Subido, pero no guardado", insertError.message);
         return;
       }
 
+      setSubiendo(false);
       Alert.alert("Documento subido", "El archivo se ha añadido correctamente.");
       setTitulo("");
       setCategoria("");
       setModalVisible(false);
       cargarDocumentos();
-    } catch (err) {
+    } catch (err: any) {
+      console.log("ERROR SUBIENDO DOCUMENTO:", err);
       setSubiendo(false);
-      Alert.alert("Error", "Ha ocurrido un problema al subir el documento.");
+      Alert.alert(
+        "Error",
+        err?.message || "Ha ocurrido un problema al subir el documento."
+      );
     }
   };
 
@@ -243,7 +246,6 @@ export default function DocumentosScreen() {
         </ScrollView>
       </View>
 
-      {/* MODAL SUBIR DOCUMENTO */}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
@@ -286,7 +288,6 @@ export default function DocumentosScreen() {
         </View>
       </Modal>
 
-      {/* TAB BAR */}
       <View style={[styles.tabBar, { height: TAB_BAR_HEIGHT }]}>
         <Tab
           icon="home-outline"
