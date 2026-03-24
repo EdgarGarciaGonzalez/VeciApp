@@ -145,7 +145,7 @@ export default function HomeScreen() {
 
           <Pressable
             style={[styles.quickCard, styles.quickLight]}
-            onPress={() => {}}
+            onPress={() => router.push("/(tabs)/votaciones")}
           >
             <Ionicons
               name="checkmark-done-outline"
