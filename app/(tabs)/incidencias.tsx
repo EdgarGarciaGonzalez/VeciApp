@@ -1,15 +1,15 @@
-import React, { useCallback, useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../../src/lib/supabase";
 
 const TAB_BAR_HEIGHT = 72;
@@ -53,7 +53,6 @@ export default function IncidenciasScreen() {
   }, [cargarIncidencias]);
 
   const irAInicio = () => router.push("/(tabs)");
-  const irAIncidencias = () => router.push("/(tabs)/incidencias");
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
