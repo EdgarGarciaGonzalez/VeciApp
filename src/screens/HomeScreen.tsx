@@ -1,7 +1,7 @@
-import React from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const actas = [
@@ -30,19 +30,6 @@ export default function HomeScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Alertas */}
-        <Text style={styles.sectionTitle}>Alertas</Text>
-
-        <View style={styles.rowItem}>
-          <Ionicons name="alert-circle-outline" size={18} />
-          <Text style={styles.rowText}>Fuga de agua</Text>
-        </View>
-
-        <View style={styles.rowItem}>
-          <Ionicons name="cash-outline" size={18} />
-          <Text style={styles.rowText}>Mensualidad</Text>
-        </View>
-
         {/* Actas digitales */}
         <Text style={[styles.sectionTitle, { marginTop: 18 }]}>
           Actas digitales
@@ -86,7 +73,7 @@ export default function HomeScreen() {
       <View style={styles.tabBar}>
         {tabs.map((t) => (
           <Pressable key={t.key} style={styles.tabItem} onPress={() => {}}>
-            <Ionicons name={t.icon} size={22} />
+            <Ionicons name={t.icon as any} size={22} />
             <Text style={styles.tabLabel}>{t.label}</Text>
           </Pressable>
         ))}

@@ -1,15 +1,15 @@
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  StyleSheet,
-  Alert,
-  ScrollView,
+    Alert,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
 import { supabase } from "../src/lib/supabase";
 
 export default function RegistroScreen() {
@@ -45,7 +45,7 @@ export default function RegistroScreen() {
     setLoading(true);
 
     // 1️⃣ Crear usuario en Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
     });
