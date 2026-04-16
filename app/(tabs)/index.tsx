@@ -179,8 +179,8 @@ export default function HomeScreen() {
         <TabButton
           icon="chatbubble-ellipses-outline"
           label="Chats"
-          onPress={() => {}}
-        />
+onPress={() => router.push("/(tabs)/chat")}
+          active        />
         <TabButton
           icon="bar-chart-outline"
           label="Economía"
