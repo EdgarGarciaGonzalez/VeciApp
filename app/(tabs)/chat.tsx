@@ -28,7 +28,7 @@ type Chat = {
 
 const CHATS: Chat[] = [
   {
-    id: "1",
+    id: "vecino_901",
     nombre: "Vecino 9º1",
     icon: "people",
     iconColor: "#2F67E8",
@@ -48,7 +48,7 @@ const CHATS: Chat[] = [
     tipo: "grupo",
   },
   {
-    id: "3",
+    id: "escalera_1",
     nombre: "Escalera 1",
     icon: "business",
     iconColor: "#2F67E8",
@@ -57,7 +57,7 @@ const CHATS: Chat[] = [
     tipo: "edificio",
   },
   {
-    id: "4",
+    id: "escalera_2",
     nombre: "Escalera 2",
     icon: "business",
     iconColor: "#2F67E8",
@@ -67,7 +67,7 @@ const CHATS: Chat[] = [
     tipo: "edificio",
   },
   {
-    id: "5",
+    id: "mantenimiento",
     nombre: "Mantenimiento",
     icon: "construct",
     iconColor: "#2F67E8",
@@ -76,7 +76,7 @@ const CHATS: Chat[] = [
     tipo: "servicio",
   },
   {
-    id: "6",
+    id: "administrador",
     nombre: "Administrador",
     icon: "person",
     iconColor: "#2F67E8",
@@ -85,7 +85,7 @@ const CHATS: Chat[] = [
     tipo: "personal",
   },
   {
-    id: "7",
+    id: "zonas_comunes",
     nombre: "Zonas comunes",
     icon: "business-outline",
     iconColor: "#2F67E8",
@@ -94,7 +94,7 @@ const CHATS: Chat[] = [
     tipo: "grupo",
   },
   {
-    id: "8",
+    id: "avisos_urgentes",
     nombre: "Avisos urgentes",
     icon: "alert-circle",
     iconColor: "#DC2626",
@@ -150,7 +150,7 @@ export default function ChatsScreen() {
         contentContainerStyle={{ paddingBottom: TAB_BAR_HEIGHT + 18 }}
       >
         {chatsFiltrados.map((chat) => (
-          <Pressable key={chat.id} style={styles.chatRow} onPress={() => {}}>
+          <Pressable key={chat.id} style={styles.chatRow} onPress={() => router.push({ pathname: "/chat/id", params: { id: chat.id, nombre: chat.nombre } })}>
             {/* Avatar / Icono */}
             <View
               style={[
