@@ -15,10 +15,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TabButton from "../../src/components/TabButton";
+import BottomTabBar, { TAB_BAR_HEIGHT } from "../../components/BottomTabBar";
 import { supabase } from "../../src/lib/supabase";
 
-const TAB_BAR_HEIGHT = 72;
 
 type Chat = {
   id: string;
@@ -446,12 +445,7 @@ export default function ChatsScreen() {
       )}
 
       {/* TAB BAR */}
-      <View style={[styles.tabBar, { height: TAB_BAR_HEIGHT }]}>
-        <TabButton icon="home-outline" label="Inicio" onPress={() => router.push("/(tabs)")} />
-        <TabButton icon="chatbubble-ellipses-outline" label="Chats" onPress={() => router.push("/(tabs)/chat")} active />
-        <TabButton icon="bar-chart-outline" label="Economia" onPress={() => router.push("/(tabs)/economia")} />
-        <TabButton icon="people-outline" label="Contactos" onPress={() => {}} />
-      </View>
+      <BottomTabBar />
 
       {/* MODAL CREAR GRUPO */}
       <Modal

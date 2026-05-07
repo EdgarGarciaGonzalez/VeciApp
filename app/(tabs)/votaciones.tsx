@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import TabButton from "../../src/components/TabButton";
+import BottomTabBar from "../../components/BottomTabBar";
 
 const TAB_BAR_HEIGHT = 76;
 
@@ -80,28 +80,7 @@ export default function VotacionesScreen() {
       </View>
 
       {/* TAB BAR */}
-      <View style={[styles.tabBar, { height: TAB_BAR_HEIGHT }]}>
-        <TabButton
-          icon="home-outline"
-          label="Inicio"
-          onPress={() => router.push("/(tabs)")}
-        />
-        <TabButton
-          icon="chatbubble-ellipses-outline"
-          label="Chats"
-          onPress={() => {}}
-        />
-        <TabButton
-          icon="bar-chart-outline"
-          label="Economía"
-          onPress={() => router.push("/(tabs)/economia")}
-        />
-        <TabButton
-          icon="people-outline"
-          label="Contactos"
-          onPress={() => {}}
-        />
-      </View>
+      <BottomTabBar />
     </SafeAreaView>
   );
 }

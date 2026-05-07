@@ -17,10 +17,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TabButton from "../../src/components/TabButton";
+import BottomTabBar, { TAB_BAR_HEIGHT } from "../../components/BottomTabBar";
 import { supabase } from "../../src/lib/supabase";
 
-const TAB_BAR_HEIGHT = 72;
 const MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -780,12 +779,7 @@ export default function EconomiaScreen() {
       )}
 
       {/* TAB BAR */}
-      <View style={[styles.bottomTabBar, { height: TAB_BAR_HEIGHT }]}>
-        <TabButton icon="home-outline" label="Inicio" onPress={() => router.push("/(tabs)")} />
-        <TabButton icon="chatbubble-ellipses-outline" label="Chats" onPress={() => router.push("/(tabs)/chat")} />
-        <TabButton icon="bar-chart-outline" label="Economia" onPress={() => router.push("/(tabs)/economia")} active />
-        <TabButton icon="people-outline" label="Contactos" onPress={() => {}} />
-      </View>
+      <BottomTabBar />
 
       {/* MODAL CREAR GASTO */}
       {usuario && (

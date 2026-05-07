@@ -4,10 +4,9 @@ import React, { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CalendarioComunidad from "../../components/CalendarioComunidad";
-import TabButton from "../../src/components/TabButton";
+import BottomTabBar, { TAB_BAR_HEIGHT } from "../../components/BottomTabBar";
 import { supabase } from "../../src/lib/supabase";
 
-const TAB_BAR_HEIGHT = 72;
 
 type Anuncio = {
   id: string;
@@ -156,29 +155,7 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
 
-      <View style={[styles.tabBar, { height: TAB_BAR_HEIGHT }]}>
-        <TabButton
-          icon="home-outline"
-          label="Inicio"
-          onPress={() => router.push("/(tabs)")}
-          active
-        />
-        <TabButton
-          icon="chatbubble-ellipses-outline"
-          label="Chats"
-onPress={() => router.push("/(tabs)/chat")}
-          active        />
-        <TabButton
-          icon="bar-chart-outline"
-          label="Economía"
-          onPress={() => router.push("/(tabs)/economia")}
-        />
-        <TabButton
-          icon="people-outline"
-          label="Contactos"
-          onPress={() => {}}
-        />
-      </View>
+      <BottomTabBar />
     </SafeAreaView>
   );
 }

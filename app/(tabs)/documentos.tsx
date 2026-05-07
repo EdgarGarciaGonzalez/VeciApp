@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import BottomTabBar from "../../components/BottomTabBar";
 import { supabase } from "../../src/lib/supabase";
 import * as DocumentPicker from "expo-document-picker";
 import { File } from "expo-file-system";
@@ -288,34 +289,7 @@ export default function DocumentosScreen() {
         </View>
       </Modal>
 
-      <View style={[styles.tabBar, { height: TAB_BAR_HEIGHT }]}>
-        <Tab
-          icon="home-outline"
-          label="Inicio"
-          onPress={() => router.push("/(tabs)")}
-        />
-        <Tab
-          icon="build-outline"
-          label="Incidencias"
-          onPress={() => router.push("/(tabs)/incidencias")}
-        />
-        <Tab
-          icon="document-text-outline"
-          label="Docs"
-          onPress={() => router.push("/(tabs)/documentos")}
-          active
-        />
-        <Tab
-          icon="bar-chart-outline"
-          label="Economía"
-          onPress={() => {}}
-        />
-        <Tab
-          icon="people-outline"
-          label="Contactos"
-          onPress={() => {}}
-        />
-      </View>
+      <BottomTabBar />
     </SafeAreaView>
   );
 }

@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import BottomTabBar from "../../components/BottomTabBar";
 import { supabase } from "../../src/lib/supabase";
 
 const TAB_BAR_HEIGHT = 72;
@@ -117,17 +118,7 @@ export default function IncidenciasScreen() {
       </View>
 
       {/* TAB BAR (igual que Home) */}
-      <View style={[styles.tabBar, { height: TAB_BAR_HEIGHT }]}>
-        <Tab
-          icon="home-outline"
-          label="Inicio"
-          onPress={irAInicio}
-          active
-        />
-        <Tab icon="chatbubble-ellipses-outline" label="Chats" onPress={() => {}} />
-        <Tab icon="bar-chart-outline" label="Economía" onPress={() => {}} />
-        <Tab icon="people-outline" label="Contactos" onPress={() => {}} />
-      </View>
+      <BottomTabBar />
     </SafeAreaView>
   );
 }
