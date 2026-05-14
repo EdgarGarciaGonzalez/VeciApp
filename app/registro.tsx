@@ -1,13 +1,14 @@
+// app/registro.tsx
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../src/lib/supabase";
@@ -22,29 +23,18 @@ export default function RegistroScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ⚠️ PON AQUÍ EL ID REAL DE TU COMUNIDAD
-  const COMUNIDAD_ID = "752e8ca8-c8d0-441a-a76a-4e3d2069eb87";
-
   const registrarse = async () => {
-    if (!COMUNIDAD_ID || COMUNIDAD_ID.includes("PEGA")) {
-      Alert.alert(
-        "Falta configurar comunidad",
-        "Pon el ID real de tu comunidad en registro.tsx"
-      );
-      return;
-    }
-
     if (!nombre.trim() || !email.trim() || password.length < 6) {
       Alert.alert(
-        "Datos inválidos",
-        "Rellena nombre, email y contraseña (mínimo 6 caracteres)."
+        "Datos invalidos",
+        "Rellena nombre, email y contrasena (minimo 6 caracteres)."
       );
       return;
     }
 
     setLoading(true);
 
-    // 1️⃣ Crear usuario en Supabase Auth
+    // 1. Crear usuario en Supabase Auth
     const { error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
@@ -56,10 +46,10 @@ export default function RegistroScreen() {
       return;
     }
 
-    // 2️⃣ Insertar perfil en tabla usuario
+    // 2. Insertar perfil SIN comunidad (se asignara en /comunidad)
     const { error: insertError } = await supabase.from("usuario").insert([
       {
-        comunidad_id: COMUNIDAD_ID,
+        comunidad_id: null,
         rol: "PROPIETARIO",
         nombre: nombre.trim(),
         apellidos: apellidos.trim() || null,
@@ -71,16 +61,16 @@ export default function RegistroScreen() {
     setLoading(false);
 
     if (insertError) {
-      Alert.alert(
-        "Usuario creado, pero fallo perfil",
-        insertError.message +
-          "\n\nSi estás probando, desactiva RLS en la tabla usuario."
-      );
+      Alert.alert("Error al crear perfil", insertError.message);
       return;
     }
 
-    Alert.alert("Cuenta creada", "Ahora puedes iniciar sesión.");
-    router.replace("/login");
+    // 3. Redirigir a la pantalla de comunidad
+    Alert.alert(
+      "Cuenta creada!",
+      "Ahora elige crear o unirte a una comunidad.",
+      [{ text: "Continuar", onPress: () => router.replace("/comunidad") }]
+    );
   };
 
   return (
@@ -96,47 +86,23 @@ export default function RegistroScreen() {
       >
         <Text style={styles.title}>Crear cuenta</Text>
         <Text style={styles.subtitle}>
-          Regístrate para acceder a tu comunidad
+          Registrate para gestionar tu comunidad
         </Text>
 
         <Text style={styles.label}>Nombre *</Text>
-        <TextInput
-          value={nombre}
-          onChangeText={setNombre}
-          style={styles.input}
-        />
+        <TextInput value={nombre} onChangeText={setNombre} style={styles.input} placeholderTextColor="#9CA3AF" placeholder="Tu nombre" />
 
         <Text style={styles.label}>Apellidos</Text>
-        <TextInput
-          value={apellidos}
-          onChangeText={setApellidos}
-          style={styles.input}
-        />
+        <TextInput value={apellidos} onChangeText={setApellidos} style={styles.input} placeholderTextColor="#9CA3AF" placeholder="Tus apellidos" />
 
-        <Text style={styles.label}>Teléfono</Text>
-        <TextInput
-          value={telefono}
-          onChangeText={setTelefono}
-          keyboardType="phone-pad"
-          style={styles.input}
-        />
+        <Text style={styles.label}>Telefono</Text>
+        <TextInput value={telefono} onChangeText={setTelefono} keyboardType="phone-pad" style={styles.input} placeholderTextColor="#9CA3AF" placeholder="600 123 456" />
 
         <Text style={styles.label}>Email *</Text>
-        <TextInput
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          style={styles.input}
-        />
+        <TextInput value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" style={styles.input} placeholderTextColor="#9CA3AF" placeholder="tu@email.com" />
 
-        <Text style={styles.label}>Contraseña *</Text>
-        <TextInput
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={styles.input}
-        />
+        <Text style={styles.label}>Contrasena *</Text>
+        <TextInput value={password} onChangeText={setPassword} secureTextEntry style={styles.input} placeholderTextColor="#9CA3AF" placeholder="Minimo 6 caracteres" />
 
         <Pressable
           onPress={registrarse}
@@ -152,8 +118,8 @@ export default function RegistroScreen() {
           onPress={() => router.replace("/login")}
           style={{ marginTop: 14, alignSelf: "center" }}
         >
-          <Text style={{ color: "#1E40AF", fontWeight: "700" }}>
-            Ya tengo cuenta · Iniciar sesión
+          <Text style={{ color: "#2F67E8", fontWeight: "700" }}>
+            Ya tengo cuenta - Iniciar sesion
           </Text>
         </Pressable>
       </ScrollView>
@@ -163,35 +129,19 @@ export default function RegistroScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "white" },
-
-  header: {
-    height: 64,
-    backgroundColor: "#0B3CCF",
-    justifyContent: "center",
-    paddingHorizontal: 18,
-  },
-  headerTitle: { color: "white", fontSize: 20, fontWeight: "700" },
-
-  title: { fontSize: 26, fontWeight: "800", marginBottom: 6 },
-  subtitle: { color: "#666", marginBottom: 22 },
-
-  label: { fontSize: 14, fontWeight: "800", marginBottom: 6 },
-
+  header: { height: 64, backgroundColor: "#2F67E8", justifyContent: "center", paddingHorizontal: 18 },
+  headerTitle: { color: "white", fontSize: 20, fontWeight: "800" },
+  title: { fontSize: 26, fontWeight: "800", marginBottom: 6, color: "#111827" },
+  subtitle: { color: "#6B7280", marginBottom: 22 },
+  label: { fontSize: 13, fontWeight: "700", color: "#374151", marginBottom: 6, marginTop: 4 },
   input: {
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-    backgroundColor: "white",
+    borderWidth: 1, borderColor: "#E5E7EB", borderRadius: 12,
+    paddingHorizontal: 14, paddingVertical: 12, marginBottom: 12,
+    backgroundColor: "white", fontSize: 15, color: "#111827",
   },
-
   button: {
-    backgroundColor: "#111827",
-    padding: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    marginTop: 6,
+    backgroundColor: "#2F67E8", padding: 15, borderRadius: 12,
+    alignItems: "center", marginTop: 10,
   },
   buttonText: { color: "white", fontWeight: "800", fontSize: 15 },
 });

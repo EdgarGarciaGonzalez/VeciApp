@@ -1,5 +1,6 @@
+// app/login.tsx
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { supabase } from "../src/lib/supabase";
@@ -13,7 +14,7 @@ export default function LoginScreen() {
 
   const iniciarSesion = async () => {
     if (!email.trim() || !password) {
-      Alert.alert("Faltan datos", "Escribe tu email y contraseña.");
+      Alert.alert("Faltan datos", "Escribe tu email y contrasena.");
       return;
     }
 
@@ -24,17 +25,31 @@ export default function LoginScreen() {
       password,
     });
 
-    setLoading(false);
-
     if (error) {
-      Alert.alert("Error al iniciar sesión", error.message);
+      setLoading(false);
+      Alert.alert("Error al iniciar sesion", error.message);
       return;
     }
 
-    if (data.session) {
-      router.replace("/(tabs)");
+    if (!data.session) {
+      setLoading(false);
+      Alert.alert("Error", "No se pudo iniciar sesion.");
+      return;
+    }
+
+    // Comprobar si tiene comunidad asignada
+    const { data: perfil } = await supabase
+      .from("usuario")
+      .select("comunidad_id")
+      .eq("email", data.session.user.email)
+      .single();
+
+    setLoading(false);
+
+    if (!perfil || !perfil.comunidad_id) {
+      router.replace("/comunidad");
     } else {
-      Alert.alert("Error", "No se pudo iniciar sesión.");
+      router.replace("/(tabs)");
     }
   };
 
@@ -45,7 +60,7 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.container}>
-        <Text style={styles.title}>Iniciar sesión</Text>
+        <Text style={styles.title}>Iniciar sesion</Text>
         <Text style={styles.subtitle}>Accede a tu comunidad</Text>
 
         <Text style={styles.label}>Email</Text>
@@ -53,16 +68,18 @@ export default function LoginScreen() {
           value={email}
           onChangeText={setEmail}
           placeholder="tuemail@correo.com"
+          placeholderTextColor="#9CA3AF"
           autoCapitalize="none"
           keyboardType="email-address"
           style={styles.input}
         />
 
-        <Text style={styles.label}>Contraseña</Text>
+        <Text style={styles.label}>Contrasena</Text>
         <TextInput
           value={password}
           onChangeText={setPassword}
-          placeholder="••••••••"
+          placeholder="Tu contrasena"
+          placeholderTextColor="#9CA3AF"
           secureTextEntry
           style={styles.input}
         />
@@ -72,17 +89,17 @@ export default function LoginScreen() {
           disabled={loading}
           style={[styles.button, loading && { opacity: 0.6 }]}
         >
-          <Text style={styles.buttonText}>
-            {loading ? "Entrando..." : "Entrar"}
-          </Text>
+          {loading
+            ? <ActivityIndicator color="white" />
+            : <Text style={styles.buttonText}>Entrar</Text>}
         </Pressable>
 
         <Pressable
           onPress={() => router.push("/registro")}
           style={{ marginTop: 14, alignSelf: "center" }}
         >
-          <Text style={{ color: "#1E40AF", fontWeight: "700" }}>
-            No tengo cuenta · Registrarme
+          <Text style={{ color: "#2F67E8", fontWeight: "700" }}>
+            No tengo cuenta - Registrarme
           </Text>
         </Pressable>
       </View>
@@ -92,37 +109,20 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "white" },
-
-  header: {
-    height: 64,
-    backgroundColor: "#0B3CCF",
-    justifyContent: "center",
-    paddingHorizontal: 18,
-  },
-  headerTitle: { color: "white", fontSize: 20, fontWeight: "700" },
-
+  header: { height: 64, backgroundColor: "#2F67E8", justifyContent: "center", paddingHorizontal: 18 },
+  headerTitle: { color: "white", fontSize: 20, fontWeight: "800" },
   container: { flex: 1, padding: 18, paddingTop: 28 },
-
-  title: { fontSize: 26, fontWeight: "800", marginBottom: 6 },
-  subtitle: { color: "#666", marginBottom: 22 },
-
-  label: { fontSize: 14, fontWeight: "800", marginBottom: 6 },
-
+  title: { fontSize: 26, fontWeight: "800", marginBottom: 6, color: "#111827" },
+  subtitle: { color: "#6B7280", marginBottom: 22 },
+  label: { fontSize: 13, fontWeight: "700", color: "#374151", marginBottom: 6 },
   input: {
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 14,
-    backgroundColor: "white",
+    borderWidth: 1, borderColor: "#E5E7EB", borderRadius: 12,
+    paddingHorizontal: 14, paddingVertical: 12, marginBottom: 14,
+    backgroundColor: "white", fontSize: 15, color: "#111827",
   },
-
   button: {
-    backgroundColor: "#111827",
-    padding: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    marginTop: 6,
+    backgroundColor: "#2F67E8", padding: 15, borderRadius: 12,
+    alignItems: "center", marginTop: 6,
   },
   buttonText: { color: "white", fontWeight: "800", fontSize: 15 },
 });
