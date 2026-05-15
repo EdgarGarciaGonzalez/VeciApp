@@ -234,7 +234,7 @@ export default function DocumentosScreen() {
                     <Ionicons
                       name="document-text-outline"
                       size={22}
-                      color="#1E40AF"
+                      color="#2F67E8"
                     />
                   </View>
 
@@ -320,11 +320,11 @@ function Tab({
 }) {
   return (
     <Pressable style={styles.tabItem} onPress={onPress}>
-      <Ionicons name={icon} size={22} color={active ? "#0B3CCF" : "#111827"} />
+      <Ionicons name={icon} size={22} color={active ? "#2F67E8" : "#111827"} />
       <Text
         style={[
           styles.tabLabel,
-          active && { color: "#0B3CCF", fontWeight: "700" },
+          active && { color: "#2F67E8", fontWeight: "700" },
         ]}
       >
         {label}
@@ -334,11 +334,11 @@ function Tab({
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "white" },
+  safe: { flex: 1, backgroundColor: "#F0F4FB" },
 
   header: {
     height: 64,
-    backgroundColor: "#0B3CCF",
+    backgroundColor: "#2F67E8",
     justifyContent: "center",
     paddingHorizontal: 18,
   },
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     borderLeftWidth: 4,
-    borderLeftColor: "#1E40AF",
+    borderLeftColor: "#2F67E8",
   },
   infoRow: {
     flexDirection: "row",
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cancelBtnText: {
-    color: "#1E40AF",
+    color: "#2F67E8",
     fontWeight: "700",
   },
 

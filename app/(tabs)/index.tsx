@@ -1,3 +1,4 @@
+// app/(tabs)/index.tsx
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -6,7 +7,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CalendarioComunidad from "../../components/CalendarioComunidad";
 import BottomTabBar, { TAB_BAR_HEIGHT } from "../../components/BottomTabBar";
 import { supabase } from "../../src/lib/supabase";
-
 
 type Anuncio = {
   id: string;
@@ -17,7 +17,6 @@ type Anuncio = {
 
 export default function HomeScreen() {
   const router = useRouter();
-
   const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
   const [comunidadId, setComunidadId] = useState<string | null>(null);
 
@@ -36,262 +35,155 @@ export default function HomeScreen() {
   useEffect(() => {
     if (!comunidadId) return;
     const cargarDatos = async () => {
-      const { data: dataAnuncios } = await supabase
+      const { data } = await supabase
         .from("anuncio")
         .select("id,titulo,descripcion,created_at")
         .eq("comunidad_id", comunidadId)
         .order("created_at", { ascending: false })
         .limit(3);
-
-      setAnuncios(dataAnuncios ?? []);
+      setAnuncios(data ?? []);
     };
-
     cargarDatos();
   }, [comunidadId]);
 
-  const irAIncidencias = () => router.push("/(tabs)/incidencias");
-  const irANuevoAnuncio = () => router.push("/nuevo-anuncio");
-
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>VeciApp</Text>
+    <SafeAreaView style={s.safe} edges={["top"]}>
+      <View style={s.header}>
+        <Text style={s.headerTitle}>VeciApp</Text>
         <View style={{ flex: 1 }} />
-        <Pressable onPress={() => router.push("/ajustes")} style={styles.headerSettingsBtn}>
+        <Pressable onPress={() => router.push("/ajustes")} style={s.headerBtn}>
           <Ionicons name="settings-outline" size={22} color="white" />
         </Pressable>
       </View>
 
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.content,
-            { paddingBottom: TAB_BAR_HEIGHT + 18 },
-          ]}
-        >
-          {/* TABLÓN DE ANUNCIOS */}
-          <View style={styles.sectionRow}>
-            <Text style={styles.sectionBigTitle}>Tablón de anuncios</Text>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ padding: 14, paddingBottom: TAB_BAR_HEIGHT + 20 }}
+      >
+        {/* TABLON */}
+        <View style={s.sectionRow}>
+          <Text style={s.sectionTitle}>Tablon de anuncios</Text>
+          <Pressable style={s.addBtn} onPress={() => router.push("/nuevo-anuncio")}>
+            <Ionicons name="add" size={16} color="white" />
+            <Text style={s.addBtnText}>Nuevo</Text>
+          </Pressable>
+        </View>
 
-            <Pressable style={styles.addButton} onPress={irANuevoAnuncio}>
-              <Ionicons name="add" size={18} color="white" />
-              <Text style={styles.addButtonText}>Añadir</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.noticeBox}>
-            {anuncios.length === 0 ? (
-              <Text style={styles.noticeText}>No hay anuncios publicados.</Text>
-            ) : (
-              anuncios.map((anuncio) => (
-                <View key={anuncio.id} style={styles.noticeItem}>
-                  <Text style={styles.noticeTitle}>{anuncio.titulo}</Text>
-                  {!!anuncio.descripcion && (
-                    <Text style={styles.noticeText}>{anuncio.descripcion}</Text>
-                  )}
+        <View style={s.card}>
+          {anuncios.length === 0 ? (
+            <View style={s.emptyBox}>
+              <Ionicons name="megaphone-outline" size={28} color="#D1D5DB" />
+              <Text style={s.emptyText}>No hay anuncios publicados</Text>
+            </View>
+          ) : (
+            anuncios.map((a, i) => (
+              <View key={a.id} style={[s.anuncioRow, i < anuncios.length - 1 && s.anuncioDivider]}>
+                <View style={s.anuncioIcon}>
+                  <Ionicons name="megaphone" size={16} color="#2F67E8" />
                 </View>
-              ))
-            )}
-          </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.anuncioTitle}>{a.titulo}</Text>
+                  {a.descripcion && <Text style={s.anuncioDesc}>{a.descripcion}</Text>}
+                </View>
+              </View>
+            ))
+          )}
+        </View>
 
-          {/* CALENDARIO COMUNIDAD */}
-          <View style={styles.sectionRow}>
-            <Text style={styles.sectionBigTitle}>Calendario</Text>
-          </View>
-          <View style={styles.calendarioBox}>
-            <CalendarioComunidad />
-          </View>
+        {/* CALENDARIO */}
+        <Text style={[s.sectionTitle, { marginTop: 16 }]}>Calendario</Text>
+        <View style={s.card}>
+          <CalendarioComunidad />
+        </View>
 
-          {/* ACCESOS RÁPIDOS */}
-          <Text style={[styles.sectionTitle, { marginTop: 18 }]}>
-            Accesos rápidos
-          </Text>
+        {/* ACCESOS RAPIDOS */}
+        <Text style={[s.sectionTitle, { marginTop: 16 }]}>Accesos rapidos</Text>
 
-          <Pressable
-            style={[styles.quickCard, styles.quickPrimary]}
-            onPress={irAIncidencias}
-          >
-            <Ionicons name="build-outline" size={20} color="#1E3A8A" />
-            <Text style={styles.quickText}>Crear incidencia</Text>
+        <View style={s.quickGrid}>
+          <Pressable style={s.quickCard} onPress={() => router.push("/(tabs)/incidencias")}>
+            <View style={[s.quickIcon, { backgroundColor: "#FEE2E2" }]}>
+              <Ionicons name="warning-outline" size={22} color="#DC2626" />
+            </View>
+            <Text style={s.quickLabel}>Incidencias</Text>
           </Pressable>
 
-          <Pressable
-            style={[styles.quickCard, styles.quickSecondary]}
-            onPress={() => router.push("/(tabs)/economia")}
-          >
-            <Ionicons name="card-outline" size={20} color="#1E40AF" />
-            <Text style={styles.quickText}>Pagos mensuales</Text>
+          <Pressable style={s.quickCard} onPress={() => router.push("/(tabs)/economia")}>
+            <View style={[s.quickIcon, { backgroundColor: "#DCFCE7" }]}>
+              <Ionicons name="card-outline" size={22} color="#16A34A" />
+            </View>
+            <Text style={s.quickLabel}>Pagos</Text>
           </Pressable>
 
-          <Pressable
-            style={[styles.quickCard, styles.quickLight]}
-            onPress={() => router.push("/(tabs)/votaciones")}
-          >
-            <Ionicons
-              name="checkmark-done-outline"
-              size={20}
-              color="#1E40AF"
-            />
-            <Text style={styles.quickText}>Votaciones</Text>
+          <Pressable style={s.quickCard} onPress={() => router.push("/(tabs)/votaciones")}>
+            <View style={[s.quickIcon, { backgroundColor: "#EEF2FF" }]}>
+              <Ionicons name="checkmark-done-outline" size={22} color="#2F67E8" />
+            </View>
+            <Text style={s.quickLabel}>Votaciones</Text>
           </Pressable>
 
-          <Pressable
-            style={[styles.quickCard, styles.quickNeutral]}
-            onPress={() => router.push("/(tabs)/documentos")}
-          >
-            <Ionicons
-              name="document-text-outline"
-              size={20}
-              color="#1E40AF"
-            />
-            <Text style={styles.quickText}>Documentos</Text>
+          <Pressable style={s.quickCard} onPress={() => router.push("/(tabs)/documentos")}>
+            <View style={[s.quickIcon, { backgroundColor: "#F5F3FF" }]}>
+              <Ionicons name="document-text-outline" size={22} color="#7C3AED" />
+            </View>
+            <Text style={s.quickLabel}>Documentos</Text>
           </Pressable>
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
 
       <BottomTabBar />
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "white" },
-
+const s = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: "#F0F4FB" },
   header: {
-    height: 64,
-    backgroundColor: "#2F67E8",
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 18,
+    height: 64, backgroundColor: "#2F67E8",
+    flexDirection: "row", alignItems: "center", paddingHorizontal: 14, gap: 8,
   },
-  headerTitle: { color: "white", fontSize: 20, fontWeight: "700" },
-  headerSettingsBtn: {
+  headerTitle: { color: "white", fontSize: 20, fontWeight: "800" },
+  headerBtn: {
     width: 38, height: 38, borderRadius: 19,
     backgroundColor: "rgba(255,255,255,0.15)",
     alignItems: "center", justifyContent: "center",
   },
 
-  content: { padding: 18 },
+  sectionRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 10 },
+  sectionTitle: { fontSize: 16, fontWeight: "700", color: "#1F2937" },
+  addBtn: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    backgroundColor: "#2F67E8", paddingVertical: 7, paddingHorizontal: 12, borderRadius: 20,
+  },
+  addBtnText: { color: "white", fontSize: 13, fontWeight: "700" },
 
-  sectionRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  sectionBigTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-  },
-  addButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: "#111827",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-  },
-  addButtonText: {
-    color: "white",
-    fontWeight: "700",
+  card: {
+    backgroundColor: "white", borderRadius: 14, padding: 16,
+    shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 6, elevation: 2,
   },
 
-  noticeBox: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 18,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-  },
-  noticeItem: {
-    marginBottom: 12,
-  },
-  noticeTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#111827",
-    marginBottom: 4,
-  },
-  noticeText: {
-    fontSize: 14,
-    color: "#475569",
-  },
+  emptyBox: { alignItems: "center", paddingVertical: 20, gap: 8 },
+  emptyText: { fontSize: 13, color: "#9CA3AF" },
 
-  sectionTitle: { fontSize: 16, fontWeight: "700", marginBottom: 10 },
+  anuncioRow: { flexDirection: "row", alignItems: "flex-start", gap: 12, paddingVertical: 10 },
+  anuncioDivider: { borderBottomWidth: 1, borderBottomColor: "#F3F4F6" },
+  anuncioIcon: {
+    width: 36, height: 36, borderRadius: 10,
+    backgroundColor: "#EEF2FF", alignItems: "center", justifyContent: "center", marginTop: 2,
+  },
+  anuncioTitle: { fontSize: 14, fontWeight: "700", color: "#111827" },
+  anuncioDesc: { fontSize: 13, color: "#6B7280", marginTop: 3, lineHeight: 18 },
 
-  alertHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 8,
+  quickGrid: {
+    flexDirection: "row", flexWrap: "wrap", gap: 10,
   },
-  alertSeeAll: { flexDirection: "row", alignItems: "center", gap: 4 },
-  alertSeeAllText: { color: "#1E40AF", fontWeight: "700" },
-
-  alertTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-  },
-  alertBox: {
-    backgroundColor: "#EEF2FF",
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: "#1E40AF",
-  },
-  alertRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    paddingVertical: 8,
-  },
-  alertText: {
-    fontSize: 15,
-    fontWeight: "500",
-  },
-
-  chipsWrap: { gap: 10 },
-  chip: {
-    alignSelf: "flex-start",
-    borderWidth: 1,
-    borderColor: "#CBD5E1",
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-  },
-  chipText: { fontSize: 13 },
-
   quickCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    padding: 16,
-    borderRadius: 14,
-    marginBottom: 12,
+    width: "48%", backgroundColor: "white", borderRadius: 14,
+    padding: 18, alignItems: "center", gap: 10,
+    shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 6, elevation: 2,
   },
-  quickText: { fontSize: 15, fontWeight: "500" },
-
-  calendarioBox: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 18,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
+  quickIcon: {
+    width: 48, height: 48, borderRadius: 14,
+    alignItems: "center", justifyContent: "center",
   },
-  quickPrimary: { backgroundColor: "#E0E7FF" },
-  quickSecondary: { backgroundColor: "#DBEAFE" },
-  quickLight: { backgroundColor: "#EFF6FF" },
-  quickNeutral: { backgroundColor: "#F1F5F9" },
-
-  tabBar: {
-    borderTopWidth: 1,
-    borderTopColor: "#E5E7EB",
-    flexDirection: "row",
-    backgroundColor: "white",
-  },
+  quickLabel: { fontSize: 13, fontWeight: "700", color: "#374151" },
 });

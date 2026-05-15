@@ -108,7 +108,7 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "white" },
+  safe: { flex: 1, backgroundColor: "#F0F4FB" },
   header: { height: 64, backgroundColor: "#2F67E8", justifyContent: "center", paddingHorizontal: 18 },
   headerTitle: { color: "white", fontSize: 20, fontWeight: "800" },
   container: { flex: 1, padding: 18, paddingTop: 28 },
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1, borderColor: "#E5E7EB", borderRadius: 12,
     paddingHorizontal: 14, paddingVertical: 12, marginBottom: 14,
-    backgroundColor: "white", fontSize: 15, color: "#111827",
+    backgroundColor: "#F9FAFB", fontSize: 15, color: "#111827",
   },
   button: {
     backgroundColor: "#2F67E8", padding: 15, borderRadius: 12,

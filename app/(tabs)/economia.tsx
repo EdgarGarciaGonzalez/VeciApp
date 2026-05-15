@@ -797,7 +797,7 @@ export default function EconomiaScreen() {
 // ─── Estilos pantalla ─────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#F8FAFC" },
+  safe: { flex: 1, backgroundColor: "#F0F4FB" },
   header: { height: 64, backgroundColor: "#2F67E8", flexDirection: "row", alignItems: "center", paddingHorizontal: 10, gap: 6 },
   backButton: { width: 32, justifyContent: "center", alignItems: "center", marginRight: 4 },
   headerTitle: { color: "white", fontSize: 20, fontWeight: "700" },
