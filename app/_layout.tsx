@@ -21,6 +21,7 @@ export default function RootLayout() {
         <Stack.Screen name="registro" options={{ headerShown: false }} />
         <Stack.Screen name="comunidad" options={{ headerShown: false }} />
         <Stack.Screen name="chat/id" options={{ headerShown: false }} />
+        <Stack.Screen name="ajustes" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <StatusBar style="auto" />

@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Alert,
     Pressable,
@@ -11,23 +11,34 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../src/lib/supabase";
 
-const COMUNIDAD_ID = "752e8ca8-c8d0-441a-a76a-4e3d2069eb87";
-
 export default function NuevoAnuncioScreen() {
   const router = useRouter();
 
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [guardando, setGuardando] = useState(false);
+  const [comunidadId, setComunidadId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const cargar = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) return;
+      const { data } = await supabase
+        .from("usuario").select("comunidad_id")
+        .eq("email", user.email).single();
+      if (data?.comunidad_id) setComunidadId(data.comunidad_id);
+    };
+    cargar();
+  }, []);
 
   const crearAnuncio = async () => {
     if (!titulo.trim()) {
-      Alert.alert("Falta título", "Escribe un título para el anuncio.");
+      Alert.alert("Falta titulo", "Escribe un titulo para el anuncio.");
       return;
     }
 
-    if (!COMUNIDAD_ID || COMUNIDAD_ID.includes("PEGA")) {
-      Alert.alert("Falta comunidad", "Pon el ID real de tu comunidad.");
+    if (!comunidadId) {
+      Alert.alert("Error", "No se pudo identificar tu comunidad.");
       return;
     }
 
@@ -35,7 +46,7 @@ export default function NuevoAnuncioScreen() {
 
     const { error } = await supabase.from("anuncio").insert([
       {
-        comunidad_id: COMUNIDAD_ID,
+        comunidad_id: comunidadId,
         titulo: titulo.trim(),
         descripcion: descripcion.trim() || null,
       },

@@ -20,8 +20,6 @@ import { File } from "expo-file-system";
 
 const TAB_BAR_HEIGHT = 72;
 
-const COMUNIDAD_ID = "752e8ca8-c8d0-441a-a76a-4e3d2069eb87";
-
 type Documento = {
   id: string;
   titulo: string;
@@ -33,6 +31,7 @@ type Documento = {
 
 export default function DocumentosScreen() {
   const router = useRouter();
+  const [comunidadId, setComunidadId] = useState<string | null>(null);
   const [documentos, setDocumentos] = useState<Documento[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -41,13 +40,27 @@ export default function DocumentosScreen() {
   const [categoria, setCategoria] = useState("");
   const [subiendo, setSubiendo] = useState(false);
 
+  // Cargar comunidad_id del usuario
+  useEffect(() => {
+    const cargar = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) return;
+      const { data } = await supabase
+        .from("usuario").select("comunidad_id")
+        .eq("email", user.email).single();
+      if (data?.comunidad_id) setComunidadId(data.comunidad_id);
+    };
+    cargar();
+  }, []);
+
   const cargarDocumentos = async () => {
+    if (!comunidadId) return;
     setErrorMsg(null);
 
     const { data, error } = await supabase
       .from("documento")
       .select("id,titulo,tipo,categoria,fecha,archivo_path")
-      .eq("comunidad_id", COMUNIDAD_ID)
+      .eq("comunidad_id", comunidadId)
       .order("fecha", { ascending: false });
 
     if (error) {
@@ -60,8 +73,8 @@ export default function DocumentosScreen() {
   };
 
   useEffect(() => {
-    cargarDocumentos();
-  }, []);
+    if (comunidadId) cargarDocumentos();
+  }, [comunidadId]);
 
   const abrirDocumento = async (archivoPath: string) => {
     const { data } = supabase.storage.from("documentos").getPublicUrl(archivoPath);
@@ -79,7 +92,7 @@ export default function DocumentosScreen() {
   };
 
   const seleccionarYSubirDocumento = async () => {
-    if (!COMUNIDAD_ID || COMUNIDAD_ID.includes("PEGA")) {
+    if (!comunidadId) {
       Alert.alert("Falta comunidad", "Pon el ID real de la comunidad en el archivo.");
       return;
     }
@@ -115,7 +128,7 @@ export default function DocumentosScreen() {
       const arrayBuffer = await pickedFile.arrayBuffer();
 
       const nombreSeguro = (asset.name || "documento.pdf").replace(/\s+/g, "-");
-      const nombreArchivo = `${COMUNIDAD_ID}/${Date.now()}-${nombreSeguro}`;
+      const nombreArchivo = `${comunidadId}/${Date.now()}-${nombreSeguro}`;
 
       const { error: uploadError } = await supabase.storage
         .from("documentos")
@@ -132,7 +145,7 @@ export default function DocumentosScreen() {
 
       const { error: insertError } = await supabase.from("documento").insert([
         {
-          comunidad_id: COMUNIDAD_ID,
+          comunidad_id: comunidadId,
           titulo: titulo.trim(),
           categoria: categoria.trim(),
           tipo: "PDF",

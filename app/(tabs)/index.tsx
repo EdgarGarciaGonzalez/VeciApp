@@ -18,32 +18,36 @@ type Anuncio = {
 export default function HomeScreen() {
   const router = useRouter();
 
-  const actas = [
-    "Acta Junta Ordinaria 15/03/2024",
-    "Acta Junta Ordinaria 20/03/2023",
-    "Acta Junta Ordinaria aprobación de cuentas 2022",
-  ];
-
   const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
+  const [comunidadId, setComunidadId] = useState<string | null>(null);
 
   useEffect(() => {
+    const cargar = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) return;
+      const { data } = await supabase
+        .from("usuario").select("comunidad_id")
+        .eq("email", user.email).single();
+      if (data?.comunidad_id) setComunidadId(data.comunidad_id);
+    };
+    cargar();
+  }, []);
+
+  useEffect(() => {
+    if (!comunidadId) return;
     const cargarDatos = async () => {
-      const { data: dataAnuncios, error: errorAnuncios } = await supabase
+      const { data: dataAnuncios } = await supabase
         .from("anuncio")
         .select("id,titulo,descripcion,created_at")
+        .eq("comunidad_id", comunidadId)
         .order("created_at", { ascending: false })
         .limit(3);
-
-      if (errorAnuncios) {
-        setAnuncios([]);
-        return;
-      }
 
       setAnuncios(dataAnuncios ?? []);
     };
 
     cargarDatos();
-  }, []);
+  }, [comunidadId]);
 
   const irAIncidencias = () => router.push("/(tabs)/incidencias");
   const irANuevoAnuncio = () => router.push("/nuevo-anuncio");
@@ -52,6 +56,10 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>VeciApp</Text>
+        <View style={{ flex: 1 }} />
+        <Pressable onPress={() => router.push("/ajustes")} style={styles.headerSettingsBtn}>
+          <Ionicons name="settings-outline" size={22} color="white" />
+        </Pressable>
       </View>
 
       <View style={{ flex: 1 }}>
@@ -85,19 +93,6 @@ export default function HomeScreen() {
                 </View>
               ))
             )}
-          </View>
-
-          {/* ACTAS */}
-          <Text style={[styles.sectionTitle, { marginTop: 8 }]}>
-            Actas digitales
-          </Text>
-
-          <View style={styles.chipsWrap}>
-            {actas.map((t) => (
-              <Pressable key={t} style={styles.chip} onPress={() => {}}>
-                <Text style={styles.chipText}>{t}</Text>
-              </Pressable>
-            ))}
           </View>
 
           {/* CALENDARIO COMUNIDAD */}
@@ -165,11 +160,17 @@ const styles = StyleSheet.create({
 
   header: {
     height: 64,
-    backgroundColor: "#0B3CCF",
-    justifyContent: "center",
+    backgroundColor: "#2F67E8",
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 18,
   },
   headerTitle: { color: "white", fontSize: 20, fontWeight: "700" },
+  headerSettingsBtn: {
+    width: 38, height: 38, borderRadius: 19,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    alignItems: "center", justifyContent: "center",
+  },
 
   content: { padding: 18 },
 
