@@ -1,21 +1,41 @@
-// src/components/BottomTabBar.tsx
-import React from "react";
+// components/BottomTabBar.tsx
+import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, usePathname } from "expo-router";
+import { supabase } from "../src/lib/supabase";
 
-const TABS = [
+type TabDef = { key: string; icon: string; label: string; roles?: string[] };
+
+// roles = undefined → visible para todos
+// roles = ["PRESIDENTE", "PROPIETARIO"] → solo esos roles
+const ALL_TABS: TabDef[] = [
   { key: "/(tabs)",            icon: "home-outline",                label: "Inicio" },
   { key: "/(tabs)/chat",       icon: "chatbubble-ellipses-outline", label: "Chats" },
-  { key: "/(tabs)/economia",   icon: "bar-chart-outline",           label: "Economia" },
+  { key: "/(tabs)/economia",   icon: "bar-chart-outline",           label: "Economia",   roles: ["PRESIDENTE", "PROPIETARIO"] },
   { key: "/(tabs)/contactos",  icon: "people-outline",              label: "Contactos" },
-] as const;
+];
 
 const TAB_BAR_HEIGHT = 72;
 
 export default function BottomTabBar() {
   const router = useRouter();
   const pathname = usePathname();
+  const [rol, setRol] = useState<string | null>(null);
+
+  useEffect(() => {
+    const cargar = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) return;
+      const { data } = await supabase
+        .from("usuario").select("rol")
+        .eq("email", user.email).single();
+      if (data) setRol(data.rol);
+    };
+    cargar();
+  }, []);
+
+  const tabs = ALL_TABS.filter((t) => !t.roles || (rol && t.roles.includes(rol)));
 
   const esActivo = (key: string) => {
     if (key === "/(tabs)") return pathname === "/" || pathname === "/(tabs)" || pathname === "/index";
@@ -24,7 +44,7 @@ export default function BottomTabBar() {
 
   return (
     <View style={styles.bar}>
-      {TABS.map((t) => {
+      {tabs.map((t) => {
         const activo = esActivo(t.key);
         return (
           <Pressable

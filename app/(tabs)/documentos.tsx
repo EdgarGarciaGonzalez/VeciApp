@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  StyleSheet,
-  Linking,
-  Alert,
-  TextInput,
-  Modal,
+  View, Text, ScrollView, Pressable, StyleSheet, Linking,
+  Alert, TextInput, Modal, KeyboardAvoidingView, Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -261,6 +254,7 @@ export default function DocumentosScreen() {
       </View>
 
       <Modal visible={modalVisible} animationType="slide" transparent>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>Subir documento</Text>
@@ -300,6 +294,7 @@ export default function DocumentosScreen() {
             </Pressable>
           </View>
         </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       <BottomTabBar />

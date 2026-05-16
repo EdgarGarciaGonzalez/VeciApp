@@ -464,6 +464,7 @@ export default function EconomiaScreen() {
   const cuotasFiltradas = filtroCuotas === "todos" ? cuotas : filtroCuotas === "pagados" ? cuotas.filter((c) => c.estado === "PAGADO") : cuotas.filter((c) => c.estado !== "PAGADO");
 
   const esPresidente = usuario?.rol === "PRESIDENTE";
+  const esTrabajador = usuario?.rol === "TRABAJADOR";
 
   const cambiarMes = (delta: number) => {
     let m = mesActivo + delta, a = anioActivo;
@@ -476,6 +477,25 @@ export default function EconomiaScreen() {
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.header}><Text style={styles.headerTitle}>Economia</Text></View>
         <View style={styles.centered}><ActivityIndicator size="large" color="#2F67E8" /></View>
+      </SafeAreaView>
+    );
+  }
+
+  // Trabajador no tiene acceso a economía
+  if (esTrabajador) {
+    return (
+      <SafeAreaView style={styles.safe} edges={["top"]}>
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <Ionicons name="chevron-back" size={20} color="white" />
+          </Pressable>
+          <Text style={styles.headerTitle}>Economia</Text>
+        </View>
+        <View style={styles.centered}>
+          <Ionicons name="lock-closed-outline" size={48} color="#D1D5DB" />
+          <Text style={{ fontSize: 16, fontWeight: "700", color: "#9CA3AF", marginTop: 12 }}>Acceso restringido</Text>
+          <Text style={{ fontSize: 13, color: "#D1D5DB", marginTop: 4 }}>Solo propietarios y presidente</Text>
+        </View>
       </SafeAreaView>
     );
   }

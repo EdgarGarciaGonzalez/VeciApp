@@ -3,16 +3,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+  ActivityIndicator, Alert, FlatList, KeyboardAvoidingView,
+  Modal, Platform, Pressable, ScrollView, StyleSheet,
+  Text, TextInput, View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BottomTabBar, { TAB_BAR_HEIGHT } from "../../components/BottomTabBar";
@@ -455,6 +448,7 @@ export default function ChatsScreen() {
         onRequestClose={() => setModalVisible(false)}
       >
         <SafeAreaView style={styles.modalSafe} edges={["top"]}>
+          <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
           <View style={styles.modalHeader}>
             <Pressable onPress={() => setModalVisible(false)}>
               <Text style={styles.modalCancelar}>Cancelar</Text>
@@ -533,6 +527,7 @@ export default function ChatsScreen() {
               )}
             </ScrollView>
           )}
+          </KeyboardAvoidingView>
         </SafeAreaView>
       </Modal>
     </SafeAreaView>

@@ -1,6 +1,6 @@
 // app/login.tsx
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet, Alert, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { supabase } from "../src/lib/supabase";
@@ -59,7 +59,8 @@ export default function LoginScreen() {
         <Text style={styles.headerTitle}>VeciApp</Text>
       </View>
 
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Iniciar sesion</Text>
         <Text style={styles.subtitle}>Accede a tu comunidad</Text>
 
@@ -102,7 +103,8 @@ export default function LoginScreen() {
             No tengo cuenta - Registrarme
           </Text>
         </Pressable>
-      </View>
+      </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -111,7 +113,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#F0F4FB" },
   header: { height: 64, backgroundColor: "#2F67E8", justifyContent: "center", paddingHorizontal: 18 },
   headerTitle: { color: "white", fontSize: 20, fontWeight: "800" },
-  container: { flex: 1, padding: 18, paddingTop: 28 },
+  container: { padding: 18, paddingTop: 28, paddingBottom: 40 },
   title: { fontSize: 26, fontWeight: "800", marginBottom: 6, color: "#111827" },
   subtitle: { color: "#6B7280", marginBottom: 22 },
   label: { fontSize: 13, fontWeight: "700", color: "#374151", marginBottom: 6 },

@@ -3,16 +3,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  View,
+  ActivityIndicator, Alert, KeyboardAvoidingView,
+  Modal, Platform, Pressable, ScrollView, StyleSheet,
+  Switch, Text, TextInput, View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../src/lib/supabase";
@@ -330,6 +323,7 @@ export default function AjustesScreen() {
       {/* ── MODAL EDITAR PERFIL ────────────────────────────── */}
       <Modal visible={editVisible} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setEditVisible(false)}>
         <SafeAreaView style={s.modalSafe} edges={["top"]}>
+          <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
           <View style={s.modalHeader}>
             <Pressable onPress={() => setEditVisible(false)}>
               <Text style={s.modalCancel}>Cancelar</Text>
@@ -357,12 +351,14 @@ export default function AjustesScreen() {
               <Text style={s.infoBoxText}>El email y el rol no se pueden cambiar desde aqui.</Text>
             </View>
           </ScrollView>
+          </KeyboardAvoidingView>
         </SafeAreaView>
       </Modal>
 
       {/* ── MODAL CAMBIAR CONTRASEÑA ──────────────────────── */}
       <Modal visible={passVisible} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setPassVisible(false)}>
         <SafeAreaView style={s.modalSafe} edges={["top"]}>
+          <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
           <View style={s.modalHeader}>
             <Pressable onPress={() => setPassVisible(false)}>
               <Text style={s.modalCancel}>Cancelar</Text>
@@ -382,6 +378,7 @@ export default function AjustesScreen() {
               <TextInput style={s.input} value={confirmPass} onChangeText={setConfirmPass} secureTextEntry placeholder="Repite la contraseña" placeholderTextColor="#9CA3AF" />
             </View>
           </ScrollView>
+          </KeyboardAvoidingView>
         </SafeAreaView>
       </Modal>
 

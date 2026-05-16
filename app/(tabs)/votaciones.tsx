@@ -3,16 +3,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Modal,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+  ActivityIndicator, Alert, KeyboardAvoidingView,
+  Modal, Platform, Pressable, RefreshControl, ScrollView,
+  StyleSheet, Text, TextInput, View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BottomTabBar, { TAB_BAR_HEIGHT } from "../../components/BottomTabBar";
@@ -219,6 +212,25 @@ export default function VotacionesScreen() {
     );
   }
 
+  // Trabajador no tiene acceso a votaciones
+  if (usuario?.rol === "TRABAJADOR") {
+    return (
+      <SafeAreaView style={styles.safe} edges={["top"]}>
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()} style={styles.backBtn}>
+            <Ionicons name="chevron-back" size={22} color="white" />
+          </Pressable>
+          <Text style={styles.headerTitle}>Votaciones</Text>
+        </View>
+        <View style={styles.centered}>
+          <Ionicons name="lock-closed-outline" size={48} color="#D1D5DB" />
+          <Text style={{ fontSize: 16, fontWeight: "700", color: "#9CA3AF", marginTop: 12 }}>Acceso restringido</Text>
+          <Text style={{ fontSize: 13, color: "#D1D5DB", marginTop: 4 }}>Solo propietarios y presidente</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       {/* HEADER */}
@@ -358,6 +370,7 @@ export default function VotacionesScreen() {
       {/* MODAL NUEVA ENCUESTA */}
       <Modal visible={modalVisible} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setModalVisible(false)}>
         <SafeAreaView style={styles.modalSafe} edges={["top"]}>
+          <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
           <View style={styles.modalHeader}>
             <Pressable onPress={() => setModalVisible(false)}>
               <Text style={styles.modalCancel}>Cancelar</Text>
@@ -406,6 +419,7 @@ export default function VotacionesScreen() {
               </Pressable>
             )}
           </ScrollView>
+          </KeyboardAvoidingView>
         </SafeAreaView>
       </Modal>
     </SafeAreaView>

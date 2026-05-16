@@ -3,17 +3,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Linking,
-  Modal,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+  ActivityIndicator, Alert, KeyboardAvoidingView, Linking, Modal, Platform,
+  Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BottomTabBar, { TAB_BAR_HEIGHT } from "../../components/BottomTabBar";
@@ -254,6 +245,26 @@ export default function ContactosScreen() {
     ]);
   };
 
+  // 7. Cambiar rol de un vecino (presidente)
+  const cambiarRol = (vecino: Vecino) => {
+    if (!esPresidente || vecino.id === usuario?.id) return;
+    const roles = ["PROPIETARIO", "TRABAJADOR", "INQUILINO"];
+    const opciones = roles
+      .filter((r) => r !== vecino.rol)
+      .map((r) => ({
+        text: rolLabel(r),
+        onPress: async () => {
+          await supabase.from("usuario").update({ rol: r }).eq("id", vecino.id);
+          cargarDatos();
+        },
+      }));
+    Alert.alert(
+      "Cambiar rol",
+      `${vecino.nombre} ${vecino.apellidos ?? ""} es ${rolLabel(vecino.rol)}`,
+      [...opciones, { text: "Cancelar", style: "cancel" as const }]
+    );
+  };
+
   // Filtro
   const vecinosFiltrados = vecinos.filter((v) =>
     `${v.nombre} ${v.apellidos ?? ""}`.toLowerCase().includes(busqueda.toLowerCase())
@@ -356,6 +367,7 @@ export default function ContactosScreen() {
                       key={v.id}
                       style={styles.vecinoRow}
                       onPress={() => !esMio && abrirChat(v)}
+                      onLongPress={() => cambiarRol(v)}
                       disabled={esMio}
                     >
                       {/* Avatar */}
@@ -466,6 +478,7 @@ export default function ContactosScreen() {
         onRequestClose={() => setModalVisible(false)}
       >
         <SafeAreaView style={styles.modalSafe} edges={["top"]}>
+          <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
           <View style={styles.modalHeader}>
             <Pressable onPress={() => setModalVisible(false)}>
               <Text style={styles.modalCancelar}>Cancelar</Text>
@@ -544,6 +557,7 @@ export default function ContactosScreen() {
               </View>
             </View>
           </ScrollView>
+          </KeyboardAvoidingView>
         </SafeAreaView>
       </Modal>
 
