@@ -19,18 +19,25 @@ export default function HomeScreen() {
   const router = useRouter();
   const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
   const [comunidadId, setComunidadId] = useState<string | null>(null);
+  const [rol, setRol] = useState<string>("");
+  const [cargandoRol, setCargandoRol] = useState(true);
 
   useEffect(() => {
     const cargar = async () => {
+      setCargandoRol(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user?.email) return;
       const { data } = await supabase
-        .from("usuario").select("comunidad_id")
+        .from("usuario").select("comunidad_id, rol")
         .eq("email", user.email).single();
       if (data?.comunidad_id) setComunidadId(data.comunidad_id);
+      if (data?.rol) setRol(data.rol);
+      setCargandoRol(false);
     };
     cargar();
   }, []);
+
+  const esTrabajador = rol === "TRABAJADOR";
 
   useEffect(() => {
     if (!comunidadId) return;
@@ -46,6 +53,16 @@ export default function HomeScreen() {
     cargarDatos();
   }, [comunidadId]);
 
+  if (cargandoRol) {
+    return (
+      <SafeAreaView style={s.safe} edges={["top"]}>
+        <View style={s.header}>
+          <Text style={s.headerTitle}>VeciApp</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={s.safe} edges={["top"]}>
       <View style={s.header}>
@@ -60,35 +77,39 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 14, paddingBottom: TAB_BAR_HEIGHT + 20 }}
       >
-        {/* TABLON */}
-        <View style={s.sectionRow}>
-          <Text style={s.sectionTitle}>Tablon de anuncios</Text>
-          <Pressable style={s.addBtn} onPress={() => router.push("/nuevo-anuncio")}>
-            <Ionicons name="add" size={16} color="white" />
-            <Text style={s.addBtnText}>Nuevo</Text>
-          </Pressable>
-        </View>
-
-        <View style={s.card}>
-          {anuncios.length === 0 ? (
-            <View style={s.emptyBox}>
-              <Ionicons name="megaphone-outline" size={28} color="#D1D5DB" />
-              <Text style={s.emptyText}>No hay anuncios publicados</Text>
+        {/* TABLON — no visible para TRABAJADOR */}
+        {!esTrabajador && (
+          <>
+            <View style={s.sectionRow}>
+              <Text style={s.sectionTitle}>Tablon de anuncios</Text>
+              <Pressable style={s.addBtn} onPress={() => router.push("/nuevo-anuncio")}>
+                <Ionicons name="add" size={16} color="white" />
+                <Text style={s.addBtnText}>Nuevo</Text>
+              </Pressable>
             </View>
-          ) : (
-            anuncios.map((a, i) => (
-              <View key={a.id} style={[s.anuncioRow, i < anuncios.length - 1 && s.anuncioDivider]}>
-                <View style={s.anuncioIcon}>
-                  <Ionicons name="megaphone" size={16} color="#2F67E8" />
+
+            <View style={s.card}>
+              {anuncios.length === 0 ? (
+                <View style={s.emptyBox}>
+                  <Ionicons name="megaphone-outline" size={28} color="#D1D5DB" />
+                  <Text style={s.emptyText}>No hay anuncios publicados</Text>
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.anuncioTitle}>{a.titulo}</Text>
-                  {a.descripcion && <Text style={s.anuncioDesc}>{a.descripcion}</Text>}
-                </View>
-              </View>
-            ))
-          )}
-        </View>
+              ) : (
+                anuncios.map((a, i) => (
+                  <View key={a.id} style={[s.anuncioRow, i < anuncios.length - 1 && s.anuncioDivider]}>
+                    <View style={s.anuncioIcon}>
+                      <Ionicons name="megaphone" size={16} color="#2F67E8" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={s.anuncioTitle}>{a.titulo}</Text>
+                      {a.descripcion && <Text style={s.anuncioDesc}>{a.descripcion}</Text>}
+                    </View>
+                  </View>
+                ))
+              )}
+            </View>
+          </>
+        )}
 
         {/* CALENDARIO */}
         <Text style={[s.sectionTitle, { marginTop: 16 }]}>Calendario</Text>
@@ -107,19 +128,23 @@ export default function HomeScreen() {
             <Text style={s.quickLabel}>Incidencias</Text>
           </Pressable>
 
-          <Pressable style={s.quickCard} onPress={() => router.push("/(tabs)/economia")}>
-            <View style={[s.quickIcon, { backgroundColor: "#DCFCE7" }]}>
-              <Ionicons name="card-outline" size={22} color="#16A34A" />
-            </View>
-            <Text style={s.quickLabel}>Pagos</Text>
-          </Pressable>
+          {!esTrabajador && (
+            <Pressable style={s.quickCard} onPress={() => router.push("/(tabs)/economia")}>
+              <View style={[s.quickIcon, { backgroundColor: "#DCFCE7" }]}>
+                <Ionicons name="card-outline" size={22} color="#16A34A" />
+              </View>
+              <Text style={s.quickLabel}>Pagos</Text>
+            </Pressable>
+          )}
 
-          <Pressable style={s.quickCard} onPress={() => router.push("/(tabs)/votaciones")}>
-            <View style={[s.quickIcon, { backgroundColor: "#EEF2FF" }]}>
-              <Ionicons name="checkmark-done-outline" size={22} color="#2F67E8" />
-            </View>
-            <Text style={s.quickLabel}>Votaciones</Text>
-          </Pressable>
+          {!esTrabajador && (
+            <Pressable style={s.quickCard} onPress={() => router.push("/(tabs)/votaciones")}>
+              <View style={[s.quickIcon, { backgroundColor: "#EEF2FF" }]}>
+                <Ionicons name="checkmark-done-outline" size={22} color="#2F67E8" />
+              </View>
+              <Text style={s.quickLabel}>Votaciones</Text>
+            </Pressable>
+          )}
 
           <Pressable style={s.quickCard} onPress={() => router.push("/(tabs)/documentos")}>
             <View style={[s.quickIcon, { backgroundColor: "#F5F3FF" }]}>

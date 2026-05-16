@@ -84,8 +84,9 @@ function ModalCrearGasto({
       setCargandoVecinos(true);
       const { data } = await supabase
         .from("usuario")
-        .select("id, nombre, apellidos")
+        .select("id, nombre, apellidos, rol")
         .eq("comunidad_id", usuario.comunidad_id)
+        .neq("rol", "TRABAJADOR") // Excluir trabajadores
         .order("nombre");
       setVecinos(data ?? []);
       // Seleccionar todos por defecto para reparto
@@ -405,11 +406,11 @@ export default function EconomiaScreen() {
       .eq("comunidad_id", usuario.comunidad_id).order("fecha", { ascending: false }).limit(50);
     if (movData) setMovimientos(movData.map((m: any) => ({ ...m, importe: parseFloat(m.importe), tipo_gasto: m.tipo_gasto ?? "comunidad" })));
 
-    // Repartos pendientes del usuario actual
+    // Repartos del usuario actual (todos, no solo pendientes)
     const { data: repartoData } = await supabase
       .from("gasto_reparto")
       .select("id, movimiento_id, usuario_id, importe, estado, movimiento:movimiento_id(concepto, fecha)")
-      .eq("usuario_id", usuario.id).eq("estado", "PENDIENTE");
+      .eq("usuario_id", usuario.id);
     if (repartoData) {
       setRepartos(repartoData.map((r: any) => ({
         id: r.id, movimiento_id: r.movimiento_id, usuario_id: r.usuario_id,
@@ -464,7 +465,6 @@ export default function EconomiaScreen() {
   const cuotasFiltradas = filtroCuotas === "todos" ? cuotas : filtroCuotas === "pagados" ? cuotas.filter((c) => c.estado === "PAGADO") : cuotas.filter((c) => c.estado !== "PAGADO");
 
   const esPresidente = usuario?.rol === "PRESIDENTE";
-  const esTrabajador = usuario?.rol === "TRABAJADOR";
 
   const cambiarMes = (delta: number) => {
     let m = mesActivo + delta, a = anioActivo;
@@ -477,25 +477,6 @@ export default function EconomiaScreen() {
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.header}><Text style={styles.headerTitle}>Economia</Text></View>
         <View style={styles.centered}><ActivityIndicator size="large" color="#2F67E8" /></View>
-      </SafeAreaView>
-    );
-  }
-
-  // Trabajador no tiene acceso a economía
-  if (esTrabajador) {
-    return (
-      <SafeAreaView style={styles.safe} edges={["top"]}>
-        <View style={styles.header}>
-          <Pressable onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={20} color="white" />
-          </Pressable>
-          <Text style={styles.headerTitle}>Economia</Text>
-        </View>
-        <View style={styles.centered}>
-          <Ionicons name="lock-closed-outline" size={48} color="#D1D5DB" />
-          <Text style={{ fontSize: 16, fontWeight: "700", color: "#9CA3AF", marginTop: 12 }}>Acceso restringido</Text>
-          <Text style={{ fontSize: 13, color: "#D1D5DB", marginTop: 4 }}>Solo propietarios y presidente</Text>
-        </View>
       </SafeAreaView>
     );
   }
@@ -596,12 +577,20 @@ export default function EconomiaScreen() {
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={styles.repartoConcepto}>{r.nombre}</Text>
-                        <Text style={styles.repartoSub}>Gasto repartido · pendiente de pago</Text>
+                        <Text style={styles.repartoSub}>
+                          Gasto repartido · {r.estado === "PAGADO" ? "pagado" : "pendiente de pago"}
+                        </Text>
                       </View>
                       <Text style={styles.repartoImporte}>{formatEur(r.importe)}</Text>
-                      <Pressable style={styles.repartoBtn} onPress={() => marcarRepartoPagado(r)}>
-                        <Ionicons name="checkmark" size={16} color="#7C3AED" />
-                      </Pressable>
+                      {r.estado === "PENDIENTE" ? (
+                        <Pressable style={styles.repartoBtn} onPress={() => marcarRepartoPagado(r)}>
+                          <Ionicons name="checkmark" size={16} color="#7C3AED" />
+                        </Pressable>
+                      ) : (
+                        <View style={[styles.repartoBtn, { backgroundColor: "#DCFCE7" }]}>
+                          <Ionicons name="checkmark-circle" size={16} color="#16A34A" />
+                        </View>
+                      )}
                     </View>
                   ))}
                 </>
@@ -798,7 +787,6 @@ export default function EconomiaScreen() {
         </ScrollView>
       )}
 
-      {/* TAB BAR */}
       <BottomTabBar />
 
       {/* MODAL CREAR GASTO */}
@@ -817,7 +805,7 @@ export default function EconomiaScreen() {
 // ─── Estilos pantalla ─────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#F0F4FB" },
+  safe: { flex: 1, backgroundColor: "#F8FAFC" },
   header: { height: 64, backgroundColor: "#2F67E8", flexDirection: "row", alignItems: "center", paddingHorizontal: 10, gap: 6 },
   backButton: { width: 32, justifyContent: "center", alignItems: "center", marginRight: 4 },
   headerTitle: { color: "white", fontSize: 20, fontWeight: "700" },
@@ -905,7 +893,6 @@ const styles = StyleSheet.create({
   movImporte: { fontSize: 14, fontWeight: "800" },
   repartidoBadge: { backgroundColor: "#EDE9FE", borderRadius: 6, paddingHorizontal: 5, paddingVertical: 1 },
   repartidoBadgeText: { fontSize: 9, fontWeight: "700", color: "#7C3AED" },
-  bottomTabBar: { borderTopWidth: 1, borderTopColor: "#D1D5DB", flexDirection: "row", backgroundColor: "white" },
 });
 
 // ─── Estilos modal ────────────────────────────────────────────────────────────

@@ -8,6 +8,8 @@ import {
   Text,
   TextInput,
   View,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { supabase } from "../src/lib/supabase";
 
@@ -127,6 +129,13 @@ export default function CalendarioComunidad() {
     if (!comunidadId) { setErrorMsg("No se pudo obtener la comunidad."); return; }
     setGuardando(true);
     setErrorMsg(null);
+
+    // Normalizar hora: si solo hay números sin :, añadir :00
+    let horaFinal = nuevoHora.trim() || "00:00";
+    if (horaFinal && !horaFinal.includes(":")) {
+      horaFinal = horaFinal + ":00";
+    }
+
     const { data, error } = await supabase
       .from("evento")
       .insert({
@@ -134,7 +143,7 @@ export default function CalendarioComunidad() {
         creado_por: usuarioId,
         titulo: nuevoTitulo.trim(),
         descripcion: nuevoDesc.trim() || null,
-        hora: nuevoHora.trim() || "00:00",
+        hora: horaFinal,
         tipo: nuevoTipo,
         fecha: diaSeleccionado,
       })
@@ -237,40 +246,45 @@ export default function CalendarioComunidad() {
 
       {/* Modal añadir evento */}
       <Modal visible={modalVisible} transparent animationType="slide" onRequestClose={() => setModalVisible(false)}>
-        <Pressable style={styles.overlay} onPress={() => setModalVisible(false)} />
-        <View style={styles.sheet}>
-          <View style={styles.sheetHandle} />
-          <Text style={styles.sheetTitulo}>Nuevo evento</Text>
-          <Text style={styles.sheetFecha}>{diaSeleccionado.split("-").reverse().join("/")}</Text>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ flex: 1 }}
+        >
+          <Pressable style={styles.overlay} onPress={() => setModalVisible(false)} />
+          <View style={styles.sheet}>
+            <View style={styles.sheetHandle} />
+            <Text style={styles.sheetTitulo}>Nuevo evento</Text>
+            <Text style={styles.sheetFecha}>{diaSeleccionado.split("-").reverse().join("/")}</Text>
 
-          {errorMsg && (
-            <View style={styles.errorBox}>
-              <Text style={styles.errorText}>{errorMsg}</Text>
+            {errorMsg && (
+              <View style={styles.errorBox}>
+                <Text style={styles.errorText}>{errorMsg}</Text>
+              </View>
+            )}
+
+            <Text style={styles.label}>Título *</Text>
+            <TextInput style={styles.input} placeholder="Ej: Revisión ascensor" placeholderTextColor="#94A3B8" value={nuevoTitulo} onChangeText={setNuevoTitulo} />
+
+            <Text style={styles.label}>Descripción</Text>
+            <TextInput style={[styles.input, styles.inputMulti]} placeholder="Detalles del evento..." placeholderTextColor="#94A3B8" value={nuevoDesc} onChangeText={setNuevoDesc} multiline numberOfLines={3} />
+
+            <Text style={styles.label}>Hora</Text>
+            <TextInput style={styles.input} placeholder="19:00" placeholderTextColor="#94A3B8" value={nuevoHora} onChangeText={setNuevoHora} />
+
+            <Text style={styles.label}>Tipo</Text>
+            <View style={styles.tiposRow}>
+              {(["reunion","mantenimiento","otro"] as const).map(t => (
+                <Pressable key={t} style={[styles.tipoChip, nuevoTipo === t && { backgroundColor: TIPO_COLORES[t], borderColor: TIPO_COLORES[t] }]} onPress={() => setNuevoTipo(t)}>
+                  <Text style={[styles.tipoChipText, nuevoTipo === t && { color: "white" }]}>{TIPO_LABELS[t]}</Text>
+                </Pressable>
+              ))}
             </View>
-          )}
 
-          <Text style={styles.label}>Título *</Text>
-          <TextInput style={styles.input} placeholder="Ej: Revisión ascensor" placeholderTextColor="#94A3B8" value={nuevoTitulo} onChangeText={setNuevoTitulo} />
-
-          <Text style={styles.label}>Descripción</Text>
-          <TextInput style={[styles.input, styles.inputMulti]} placeholder="Detalles del evento..." placeholderTextColor="#94A3B8" value={nuevoDesc} onChangeText={setNuevoDesc} multiline numberOfLines={3} />
-
-          <Text style={styles.label}>Hora</Text>
-          <TextInput style={styles.input} placeholder="19:00" placeholderTextColor="#94A3B8" value={nuevoHora} onChangeText={setNuevoHora} />
-
-          <Text style={styles.label}>Tipo</Text>
-          <View style={styles.tiposRow}>
-            {(["reunion","mantenimiento","otro"] as const).map(t => (
-              <Pressable key={t} style={[styles.tipoChip, nuevoTipo === t && { backgroundColor: TIPO_COLORES[t], borderColor: TIPO_COLORES[t] }]} onPress={() => setNuevoTipo(t)}>
-                <Text style={[styles.tipoChipText, nuevoTipo === t && { color: "white" }]}>{TIPO_LABELS[t]}</Text>
-              </Pressable>
-            ))}
+            <Pressable style={[styles.guardarBtn, guardando && { opacity: 0.6 }]} onPress={guardarEvento} disabled={guardando}>
+              {guardando ? <ActivityIndicator color="white" /> : <Text style={styles.guardarBtnText}>Guardar evento</Text>}
+            </Pressable>
           </View>
-
-          <Pressable style={[styles.guardarBtn, guardando && { opacity: 0.6 }]} onPress={guardarEvento} disabled={guardando}>
-            {guardando ? <ActivityIndicator color="white" /> : <Text style={styles.guardarBtnText}>Guardar evento</Text>}
-          </Pressable>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );

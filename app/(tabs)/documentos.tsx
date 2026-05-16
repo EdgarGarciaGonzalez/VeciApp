@@ -268,12 +268,22 @@ export default function DocumentosScreen() {
             />
 
             <Text style={styles.label}>Categoría</Text>
-            <TextInput
-              value={categoria}
-              onChangeText={setCategoria}
-              style={styles.input}
-              placeholder="Ej: Actas"
-            />
+            <Pressable
+              style={[styles.input, { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 14 }]}
+              onPress={() => {
+                const categorias = ["Actas", "Contratos", "Seguros", "Normativas", "Presupuestos", "Facturas", "Otros"];
+                Alert.alert(
+                  "Selecciona categoría",
+                  "",
+                  categorias.map((c) => ({ text: c, onPress: () => setCategoria(c) }))
+                );
+              }}
+            >
+              <Text style={{ fontSize: 15, color: categoria ? "#111827" : "#9CA3AF" }}>
+                {categoria || "Ej: Actas"}
+              </Text>
+              <Ionicons name="chevron-down" size={18} color="#9CA3AF" />
+            </Pressable>
 
             <Pressable
               style={[styles.openButton, { marginTop: 10 }]}
